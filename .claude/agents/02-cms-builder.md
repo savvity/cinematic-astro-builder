@@ -1,796 +1,408 @@
 ---
 name: cms-builder
-description: Builds and deploys a Payload CMS instance to Railway as a headless backend for the Astro cinematic site. Handles scaffolding, collection definitions, Railway provisioning, PostgreSQL setup, and returns the live CMS URL.
+description: Adds Keystatic CMS to the Astro site. Keystatic is a git-based CMS that runs inside the Astro project with no separate server, no Railway, no extra accounts. Content is stored as files in the git repo. The admin UI deploys to Cloudflare Pages alongside the site.
 tools: Bash, Read, Write, Edit, Glob, Grep
 model: sonnet
 ---
 
-# CMS Builder Agent
+# CMS Builder Agent — Keystatic
 
-You scaffold Payload CMS 3 as a headless backend, deploy it to Railway with PostgreSQL, and return the Railway public URL. You do not build the Astro frontend — only the CMS.
+You add Keystatic CMS to the existing Astro site. Keystatic stores content as YAML/Markdown files in the git repo and provides a browser-based admin UI at `/keystatic`. It runs entirely on Cloudflare Pages alongside the site — no separate server, no Railway, no extra accounts beyond GitHub.
 
-Read the spawn prompt carefully. Extract:
-- `brand_name` — the brand name
-- `brand_slug` — kebab-case slug (derive from brand_name if not explicit: lowercase, spaces to hyphens)
-- `domain` — the intended domain (used for CORS and NEXT_PUBLIC_SERVER_URL)
+Read the spawn prompt. Extract:
+- `brand_name`
+- `brand_slug`
+- `domain`
+- `github_repo` — e.g., `savvity/nura-health-site`
+
+Find the Astro project directory:
+```bash
+find . -name "astro.config.*" -maxdepth 3 2>/dev/null
+```
+
+Work from inside the Astro project directory for all steps.
 
 ---
 
-## Phase 1: Scaffold Payload CMS
-
-The Astro site was built in `./{brand_slug}-site/`. Create the CMS alongside it:
+## Phase 1: Install Dependencies
 
 ```bash
-# From the parent directory of the Astro site
-mkdir cms
-cd cms
-npx create-payload-app@latest . --template blank --db postgres --no-git
+npm install @keystatic/core @keystatic/astro @astrojs/markdoc @astrojs/cloudflare
 ```
 
-The `--template blank` flag creates a minimal Payload 3 app with Next.js and a PostgreSQL adapter but no pre-built collections. You will add all collections manually.
-
-If `create-payload-app` asks interactive questions:
-- Database: postgres
-- Sharp for image optimization: Yes
-- Project name: use the brand_slug
-
-After scaffolding, confirm the directory structure:
-```bash
-ls cms/src/
-# Should show: app/  collections/  payload.config.ts (or payload.config.js)
-```
+If `@astrojs/cloudflare` is already installed, that is fine.
 
 ---
 
-## Phase 2: Install Dependencies
+## Phase 2: Create keystatic.config.ts
 
-```bash
-cd cms
-npm install
-```
+Write `keystatic.config.ts` in the project root (same level as `astro.config.mjs`):
 
-If `package.json` does not already include `@payloadcms/plugin-seo`, add it:
-```bash
-npm install @payloadcms/plugin-seo
-```
-
----
-
-## Phase 3: Write All Collection Files
-
-Create each collection file. Payload 3 uses TypeScript-first collection configs.
-
-### `cms/src/collections/Media.ts`
 ```typescript
-import type { CollectionConfig } from 'payload'
+import { config, collection, fields, singleton } from '@keystatic/core'
 
-export const Media: CollectionConfig = {
-  slug: 'media',
-  admin: {
-    useAsTitle: 'filename',
-  },
-  access: {
-    read: () => true,
-  },
-  upload: {
-    staticDir: '../public/cms-uploads',
-    mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'],
-    imageSizes: [
-      { name: 'thumbnail', width: 400, height: 300, position: 'centre' },
-      { name: 'card', width: 768, height: 576, position: 'centre' },
-      { name: 'hero', width: 1600, height: 900, position: 'centre' },
-    ],
-  },
-  fields: [
-    {
-      name: 'alt',
-      type: 'text',
-      required: true,
-      label: 'Alt Text (for accessibility and SEO)',
-    },
-    {
-      name: 'caption',
-      type: 'text',
-    },
-  ],
-}
-```
-
-### `cms/src/collections/Services.ts`
-```typescript
-import type { CollectionConfig } from 'payload'
-
-export const Services: CollectionConfig = {
-  slug: 'services',
-  admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'shortDescription', 'featured', 'order'],
-  },
-  access: {
-    read: () => true,
-  },
-  fields: [
-    {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      admin: {
-        description: 'URL-friendly identifier (e.g. "primary-care"). Auto-generate from title.',
-      },
-    },
-    {
-      name: 'shortDescription',
-      type: 'text',
-      required: true,
-      admin: {
-        description: 'One sentence. Shown in cards and listings.',
-      },
-    },
-    {
-      name: 'description',
-      type: 'richText',
-      required: true,
-    },
-    {
-      name: 'icon',
-      type: 'text',
-      admin: {
-        description: 'Phosphor icon name (e.g. "Heart", "Brain", "Activity")',
-      },
-    },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        description: 'Show on homepage features section',
-      },
-    },
-    {
-      name: 'order',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        description: 'Display order (lower = first)',
-      },
-    },
-    {
-      name: 'metaDescription',
-      type: 'text',
-      admin: {
-        description: '140-155 characters for SEO. Leave blank to auto-generate.',
-      },
-    },
-  ],
-}
-```
-
-### `cms/src/collections/Posts.ts`
-```typescript
-import type { CollectionConfig } from 'payload'
-
-export const Posts: CollectionConfig = {
-  slug: 'posts',
-  admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'status', 'publishedDate', 'author'],
-  },
-  access: {
-    read: ({ req }) => {
-      // Published posts are public; drafts only for authenticated users
-      if (req.user) return true
-      return { equals: { status: 'published' } }
-    },
-  },
-  versions: {
-    drafts: true,
-  },
-  fields: [
-    {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-    },
-    {
-      name: 'status',
-      type: 'select',
-      options: ['draft', 'published'],
-      defaultValue: 'draft',
-      required: true,
-    },
-    {
-      name: 'publishedDate',
-      type: 'date',
-      admin: {
-        date: { pickerAppearance: 'dayOnly' },
-      },
-    },
-    {
-      name: 'author',
-      type: 'text',
-    },
-    {
-      name: 'excerpt',
-      type: 'text',
-      admin: {
-        description: '1-2 sentences. Shown in blog listing cards.',
-      },
-    },
-    {
-      name: 'featuredImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'content',
-      type: 'richText',
-      required: true,
-    },
-    {
-      name: 'tags',
-      type: 'array',
-      fields: [{ name: 'tag', type: 'text' }],
-    },
-    {
-      name: 'metaDescription',
-      type: 'text',
-      admin: {
-        description: '140-155 characters for SEO.',
-      },
-    },
-    {
-      name: 'ogImage',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Open Graph image. Use 1200x630px. Defaults to featuredImage.',
-      },
-    },
-  ],
-}
-```
-
-### `cms/src/collections/Testimonials.ts`
-```typescript
-import type { CollectionConfig } from 'payload'
-
-export const Testimonials: CollectionConfig = {
-  slug: 'testimonials',
-  admin: {
-    useAsTitle: 'authorName',
-    defaultColumns: ['authorName', 'company', 'rating', 'featured'],
-  },
-  access: {
-    read: () => true,
-  },
-  fields: [
-    {
-      name: 'authorName',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'authorTitle',
-      type: 'text',
-      admin: { description: 'e.g. "CEO at Acme Corp"' },
-    },
-    {
-      name: 'company',
-      type: 'text',
-    },
-    {
-      name: 'avatar',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'quote',
-      type: 'textarea',
-      required: true,
-    },
-    {
-      name: 'rating',
-      type: 'number',
-      min: 1,
-      max: 5,
-      defaultValue: 5,
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-    },
-    {
-      name: 'order',
-      type: 'number',
-      defaultValue: 0,
-    },
-  ],
-}
-```
-
-### `cms/src/collections/PricingTiers.ts`
-```typescript
-import type { CollectionConfig } from 'payload'
-
-export const PricingTiers: CollectionConfig = {
-  slug: 'pricing-tiers',
-  admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'price', 'featured', 'order'],
-  },
-  access: {
-    read: () => true,
-  },
-  fields: [
-    {
-      name: 'name',
-      type: 'text',
-      required: true,
-      admin: { description: 'e.g. "Essential", "Performance", "Enterprise"' },
-    },
-    {
-      name: 'price',
-      type: 'text',
-      required: true,
-      admin: { description: 'e.g. "$99/mo" or "Custom"' },
-    },
-    {
-      name: 'description',
-      type: 'text',
-      required: true,
-      admin: { description: 'One-line pitch for this tier.' },
-    },
-    {
-      name: 'features',
-      type: 'array',
-      fields: [
-        { name: 'feature', type: 'text', required: true },
-        {
-          name: 'included',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Unchecked = shown as excluded/grayed out' },
+// Production: GitHub mode (admin UI commits content changes to the repo, triggering a Cloudflare rebuild).
+// Development: local mode (saves directly to files on disk).
+const storage =
+  process.env.NODE_ENV === 'production'
+    ? ({
+        kind: 'github',
+        repo: {
+          owner: process.env.GITHUB_REPO_OWNER || 'your-github-username',
+          name: process.env.GITHUB_REPO_NAME || 'your-repo-name',
         },
-      ],
-    },
-    {
-      name: 'ctaLabel',
-      type: 'text',
-      defaultValue: 'Get started',
-    },
-    {
-      name: 'ctaUrl',
-      type: 'text',
-      defaultValue: '/contact',
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { description: 'The highlighted/recommended tier (middle card).' },
-    },
-    {
-      name: 'badge',
-      type: 'text',
-      admin: { description: 'Optional badge text, e.g. "Most Popular"' },
-    },
-    {
-      name: 'order',
-      type: 'number',
-      defaultValue: 0,
-    },
-  ],
-}
-```
+      } as const)
+    : ({ kind: 'local' } as const)
 
-### `cms/src/globals/SiteSettings.ts`
-```typescript
-import type { GlobalConfig } from 'payload'
-
-export const SiteSettings: GlobalConfig = {
-  slug: 'site-settings',
-  access: {
-    read: () => true,
-  },
-  admin: {
-    group: 'Site Configuration',
-  },
-  fields: [
-    {
-      name: 'brandName',
-      type: 'text',
-      required: true,
-      label: 'Brand Name',
-    },
-    {
-      name: 'tagline',
-      type: 'text',
-      label: 'Tagline / One-Line Purpose',
-    },
-    {
-      name: 'domain',
-      type: 'text',
-      label: 'Domain (without https://)',
-      admin: { description: 'e.g. nurahealth.com' },
-    },
-    {
-      name: 'primaryCta',
-      type: 'text',
-      label: 'Primary CTA Text',
-    },
-    {
-      name: 'primaryCtaUrl',
-      type: 'text',
-      label: 'Primary CTA URL',
-      defaultValue: '/contact',
-    },
-    {
-      name: 'email',
-      type: 'email',
-      label: 'Contact Email',
-    },
-    {
-      name: 'phone',
-      type: 'text',
-      label: 'Phone Number',
-    },
-    {
-      name: 'address',
-      type: 'textarea',
-      label: 'Physical Address',
-    },
-    {
-      name: 'socialLinks',
-      type: 'group',
-      fields: [
-        { name: 'twitter', type: 'text' },
-        { name: 'linkedin', type: 'text' },
-        { name: 'instagram', type: 'text' },
-        { name: 'facebook', type: 'text' },
-      ],
-    },
-    {
-      name: 'defaultMetaDescription',
-      type: 'text',
-      label: 'Default Meta Description',
-      admin: { description: '140-155 characters. Used on pages without a specific description.' },
-    },
-    {
-      name: 'ogImage',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Default OG Image (1200x630px)',
-    },
-    {
-      name: 'googleAnalyticsId',
-      type: 'text',
-      label: 'Google Analytics ID (G-XXXXXXXXXX)',
-    },
-  ],
-}
-```
-
----
-
-## Phase 4: Write payload.config.ts
-
-Overwrite the scaffolded payload.config.ts with a complete headless configuration:
-
-Write the file `cms/src/payload.config.ts`:
-```typescript
-import { buildConfig } from 'payload'
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import sharp from 'sharp'
-
-import { Media } from './collections/Media'
-import { Services } from './collections/Services'
-import { Posts } from './collections/Posts'
-import { Testimonials } from './collections/Testimonials'
-import { PricingTiers } from './collections/PricingTiers'
-import { SiteSettings } from './globals/SiteSettings'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
-
-const allowedOrigins = [
-  process.env.NEXT_PUBLIC_SERVER_URL || '',
-  process.env.ASTRO_SITE_URL || '',
-  'http://localhost:4321',
-  'http://localhost:3000',
-].filter(Boolean)
-
-export default buildConfig({
-  admin: {
-    user: 'users',
-    meta: {
-      titleSuffix: '— CMS Admin',
+export default config({
+  storage,
+  ui: {
+    brand: {
+      name: process.env.PUBLIC_BRAND_NAME || 'Site Admin',
     },
   },
-  collections: [Media, Services, Posts, Testimonials, PricingTiers],
-  globals: [SiteSettings],
-  editor: lexicalEditor({}),
-  secret: process.env.PAYLOAD_SECRET || 'CHANGE_ME_IN_PRODUCTION',
-  typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
+
+  collections: {
+    posts: collection({
+      label: 'Blog Posts',
+      slugField: 'title',
+      path: 'src/content/posts/*',
+      format: { contentField: 'content' },
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+        publishedDate: fields.date({
+          label: 'Published Date',
+          validation: { isRequired: true },
+        }),
+        excerpt: fields.text({
+          label: 'Excerpt',
+          multiline: true,
+          description: '1-2 sentences shown in blog listing cards.',
+        }),
+        author: fields.text({ label: 'Author' }),
+        featuredImage: fields.image({
+          label: 'Featured Image',
+          directory: 'public/images/posts',
+          publicPath: '/images/posts/',
+        }),
+        metaDescription: fields.text({
+          label: 'Meta Description',
+          multiline: true,
+          description: '140-155 characters for SEO.',
+        }),
+        content: fields.markdoc({
+          label: 'Content',
+          extension: 'mdoc',
+        }),
+      },
+    }),
+
+    services: collection({
+      label: 'Services',
+      slugField: 'title',
+      path: 'src/content/services/*',
+      schema: {
+        title: fields.slug({ name: { label: 'Service Name' } }),
+        shortDescription: fields.text({
+          label: 'Short Description',
+          description: 'One sentence. Shown in cards.',
+        }),
+        icon: fields.text({
+          label: 'Phosphor Icon Name',
+          description: 'e.g. "Heart", "Brain", "Activity"',
+        }),
+        featured: fields.checkbox({
+          label: 'Show on homepage',
+          defaultValue: false,
+        }),
+        order: fields.integer({ label: 'Display Order', defaultValue: 0 }),
+        metaDescription: fields.text({
+          label: 'Meta Description',
+          multiline: true,
+          description: '140-155 characters.',
+        }),
+        description: fields.markdoc({
+          label: 'Full Description',
+          extension: 'mdoc',
+        }),
+      },
+    }),
+
+    testimonials: collection({
+      label: 'Testimonials',
+      slugField: 'authorName',
+      path: 'src/content/testimonials/*',
+      schema: {
+        authorName: fields.slug({ name: { label: 'Author Name' } }),
+        authorTitle: fields.text({ label: 'Title / Role', description: 'e.g. "CEO at Acme Corp"' }),
+        company: fields.text({ label: 'Company' }),
+        quote: fields.text({ label: 'Quote', multiline: true }),
+        rating: fields.integer({ label: 'Rating (1-5)', defaultValue: 5 }),
+        featured: fields.checkbox({ label: 'Featured', defaultValue: false }),
+        order: fields.integer({ label: 'Display Order', defaultValue: 0 }),
+        avatar: fields.image({
+          label: 'Avatar',
+          directory: 'public/images/testimonials',
+          publicPath: '/images/testimonials/',
+        }),
+      },
+    }),
   },
-  db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URI || process.env.DATABASE_URL,
-    },
-  }),
-  sharp,
-  cors: allowedOrigins,
-  csrf: allowedOrigins,
-  upload: {
-    limits: {
-      fileSize: 10000000, // 10MB
-    },
+
+  singletons: {
+    siteSettings: singleton({
+      label: 'Site Settings',
+      path: 'src/content/site-settings',
+      schema: {
+        brandName: fields.text({ label: 'Brand Name' }),
+        tagline: fields.text({ label: 'Tagline' }),
+        email: fields.text({ label: 'Contact Email' }),
+        phone: fields.text({ label: 'Phone Number' }),
+        address: fields.text({ label: 'Address', multiline: true }),
+        primaryCtaLabel: fields.text({ label: 'Primary CTA Label' }),
+        primaryCtaUrl: fields.text({ label: 'Primary CTA URL', defaultValue: '/contact' }),
+        twitterUrl: fields.text({ label: 'Twitter / X URL' }),
+        linkedinUrl: fields.text({ label: 'LinkedIn URL' }),
+        instagramUrl: fields.text({ label: 'Instagram URL' }),
+        defaultMetaDescription: fields.text({
+          label: 'Default Meta Description',
+          multiline: true,
+          description: '140-155 characters.',
+        }),
+        googleAnalyticsId: fields.text({ label: 'Google Analytics ID (G-XXXXXXXXXX)' }),
+      },
+    }),
+
+    pricingTiers: singleton({
+      label: 'Pricing Tiers',
+      path: 'src/content/pricing',
+      schema: {
+        tiers: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Tier Name' }),
+            price: fields.text({ label: 'Price', description: 'e.g. "$99/mo" or "Custom"' }),
+            description: fields.text({ label: 'One-line pitch' }),
+            featured: fields.checkbox({ label: 'Highlighted tier' }),
+            badge: fields.text({ label: 'Badge text (optional)' }),
+            ctaLabel: fields.text({ label: 'CTA Label', defaultValue: 'Get started' }),
+            ctaUrl: fields.text({ label: 'CTA URL', defaultValue: '/contact' }),
+            features: fields.array(
+              fields.object({
+                feature: fields.text({ label: 'Feature' }),
+                included: fields.checkbox({ label: 'Included', defaultValue: true }),
+              }),
+              { label: 'Features', itemLabel: (props) => props.fields.feature.value }
+            ),
+          }),
+          { label: 'Tiers', itemLabel: (props) => props.fields.name.value }
+        ),
+      },
+    }),
   },
 })
 ```
 
-Important: The PostgreSQL adapter reads `DATABASE_URI` first, then falls back to `DATABASE_URL`. Railway automatically sets `DATABASE_URL` when you add a PostgreSQL plugin. This config handles both.
-
 ---
 
-## Phase 5: Configure Next.js for Headless Mode
+## Phase 3: Update astro.config.mjs
 
-The scaffolded Next.js app includes a frontend. Since you only need the API and admin UI, configure it to serve only those:
+Read the current config first:
+```bash
+cat astro.config.mjs 2>/dev/null || cat astro.config.ts 2>/dev/null
+```
 
-Write `cms/next.config.mjs`:
+Make these changes (preserve all existing content):
+1. Add imports for `keystatic`, `markdoc`, and `cloudflare`
+2. Change `output: 'static'` to `output: 'hybrid'`
+3. Add `adapter: cloudflare()`
+4. Add `keystatic()` and `markdoc()` to `integrations`
+
+Final shape (adapt to match existing config):
 ```javascript
-import { withPayload } from '@payloadcms/next/withPayload'
+import { defineConfig } from 'astro/config'
+import tailwindcss from '@tailwindcss/vite'
+import sitemap from '@astrojs/sitemap'
+import icon from 'astro-icon'
+import keystatic from '@keystatic/astro'
+import markdoc from '@astrojs/markdoc'
+import cloudflare from '@astrojs/cloudflare'
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Redirect root to admin
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/admin',
-        permanent: false,
-      },
-    ]
+export default defineConfig({
+  site: 'https://yourdomain.com',
+  output: 'hybrid',
+  adapter: cloudflare(),
+  integrations: [
+    sitemap(),
+    icon({ iconDir: 'src/icons' }),
+    keystatic(),
+    markdoc(),
+  ],
+  vite: {
+    plugins: [tailwindcss()],
   },
-  // Allow images from any domain (for admin uploads)
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-  },
-}
-
-export default withPayload(nextConfig)
+})
 ```
 
 ---
 
-## Phase 6: Create Environment Files
+## Phase 4: Create Keystatic Route Files
 
-Create `cms/.env`:
-```
-# These will be overridden by Railway environment variables in production
-# Local development values only
-DATABASE_URI=postgresql://localhost:5432/cms_local
-PAYLOAD_SECRET=local-dev-secret-change-me
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-ASTRO_SITE_URL=http://localhost:4321
+Write `src/pages/keystatic/[...params].astro`:
+```astro
+---
+export { getStaticPaths, default } from '@keystatic/astro/route'
+export const prerender = false
+---
 ```
 
-Create or update `cms/.env.example`:
-```
-DATABASE_URI=postgresql://user:password@host:5432/dbname
-PAYLOAD_SECRET=your-long-random-secret-min-32-chars
-NEXT_PUBLIC_SERVER_URL=https://your-railway-domain.up.railway.app
-ASTRO_SITE_URL=https://your-domain.com
-```
-
-Update `cms/.gitignore` to ensure secrets are not committed:
-```bash
-# Check if .gitignore exists, then add .env if not already there
-grep -q "\.env$" cms/.gitignore 2>/dev/null || echo ".env" >> cms/.gitignore
+Write `src/pages/api/keystatic/[...params].ts`:
+```typescript
+export { all as GET, all as POST } from '@keystatic/astro/api'
+export const prerender = false
 ```
 
 ---
 
-## Phase 7: Deploy to Railway
+## Phase 5: Create Content Directories and Seed Content
 
-### 7a: Initialize Railway project
 ```bash
-cd cms
-railway init
-```
-When prompted:
-- Create a new project: Yes
-- Project name: use `{brand_slug}-cms`
-
-### 7b: Add PostgreSQL database
-```bash
-railway add --database postgres
-```
-This provisions a managed PostgreSQL instance and automatically sets the `DATABASE_URL` environment variable in Railway.
-
-### 7c: Set required environment variables
-```bash
-# Generate a secure random secret
-PAYLOAD_SECRET=$(openssl rand -hex 32)
-railway variables set PAYLOAD_SECRET="$PAYLOAD_SECRET"
-
-# Set the public server URL — Railway provides this after first deploy
-# For now set a placeholder; update after first deploy
-railway variables set NEXT_PUBLIC_SERVER_URL="https://placeholder.up.railway.app"
+mkdir -p src/content/posts
+mkdir -p src/content/services
+mkdir -p src/content/testimonials
+mkdir -p src/content/pricing
+mkdir -p public/images/posts
+mkdir -p public/images/testimonials
 ```
 
-### 7d: Deploy
+Get today's date:
 ```bash
-railway up --detach
+date +%Y-%m-%d
 ```
 
-The `--detach` flag starts the deployment and returns immediately. The deploy takes 2-4 minutes.
+Write `src/content/posts/welcome.mdoc` (replace placeholders with actual values):
+```markdown
+---
+title: Welcome to {brand_name}
+publishedDate: {today_date}
+excerpt: We're excited to share what we're building and why we started {brand_name}.
+author: The {brand_name} Team
+metaDescription: Learn about {brand_name} — {brand_purpose}. Discover what makes us different and how we can help you.
+---
 
-### 7e: Get the Railway public URL
-```bash
-# Wait 30 seconds for deploy to start
-sleep 30
+Welcome to {brand_name}. This is your first blog post.
 
-# Get the public URL
-railway domain
+Edit or delete this post from the CMS admin panel at `/keystatic` after your site goes live.
+
+## Getting started with the CMS
+
+Visit `/keystatic` on your site to access the content editor. No coding required — create posts, edit services, add testimonials, and update site settings from your browser.
 ```
 
-If `railway domain` returns empty, run:
-```bash
-railway open
-```
-This opens the Railway dashboard. The URL is shown in the project settings under "Domains". It follows the pattern: `https://{project-name}-{random}.up.railway.app`
-
-Store this URL as `{railway_url}`.
-
-### 7f: Update NEXT_PUBLIC_SERVER_URL with real URL
-```bash
-railway variables set NEXT_PUBLIC_SERVER_URL="{railway_url}"
-```
-
-Then redeploy to apply:
-```bash
-railway up --detach
+Write `src/content/site-settings.yaml`:
+```yaml
+brandName: "{brand_name}"
+tagline: ""
+email: ""
+phone: ""
+address: ""
+primaryCtaLabel: "Get in touch"
+primaryCtaUrl: "/contact"
+twitterUrl: ""
+linkedinUrl: ""
+instagramUrl: ""
+defaultMetaDescription: ""
+googleAnalyticsId: ""
 ```
 
 ---
 
-## Phase 8: Seed Initial Site Settings
+## Phase 6: Update Environment Files
 
-After the Railway deployment is live (check by visiting `{railway_url}/admin`), seed the site settings via the Payload REST API:
-
-```bash
-# First, create the admin user (this is done via the UI — see note below)
-# Then authenticate and seed
-
-# Seed site settings (requires admin token)
-# The admin user must be created first via the browser
-echo "========================================="
-echo "ACTION REQUIRED: Create Admin User"
-echo "========================================="
-echo ""
-echo "Visit: {railway_url}/admin/create-first-user"
-echo ""
-echo "This page only appears on first deployment."
-echo "Create your admin credentials there."
-echo ""
-echo "After creating the admin user, continue."
-echo "========================================="
+Append to `.env`:
+```
+# Keystatic CMS
+GITHUB_REPO_OWNER=your-github-username
+GITHUB_REPO_NAME={brand_slug}-site
+PUBLIC_BRAND_NAME={brand_name}
 ```
 
-After the user confirms they created the admin user, seed site settings:
-
-```bash
-# Get auth token
-AUTH_RESPONSE=$(curl -s -X POST "{railway_url}/api/users/login" \
-  -H "Content-Type: application/json" \
-  -d '{"email":"ADMIN_EMAIL","password":"ADMIN_PASSWORD"}')
-
-TOKEN=$(echo "$AUTH_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('token',''))")
-
-if [ -z "$TOKEN" ]; then
-  echo "Auth failed. Seeding skipped — seed manually via the admin UI."
-else
-  # Seed site settings
-  curl -s -X POST "{railway_url}/api/globals/site-settings" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: JWT $TOKEN" \
-    -d "{
-      \"brandName\": \"{brand_name}\",
-      \"domain\": \"{domain}\",
-      \"tagline\": \"\"
-    }"
-  echo "Site settings seeded."
-fi
+Append to `.env.example`:
 ```
-
-Note: If automated seeding fails (wrong email/password), tell the user to set the site settings manually via the admin UI at `{railway_url}/admin/globals/site-settings`.
-
----
-
-## Phase 9: Verify Deployment
-
-Run these checks:
-
-```bash
-# Check admin UI is accessible
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "{railway_url}/admin")
-echo "Admin UI status: $HTTP_STATUS"
-# Expected: 200 or 302 (redirect to login)
-
-# Check API is responding
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "{railway_url}/api/services")
-echo "Services API status: $API_STATUS"
-# Expected: 200 (returns empty array if no services yet)
-
-# Check globals endpoint
-GLOBALS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "{railway_url}/api/globals/site-settings")
-echo "Site settings API status: $GLOBALS_STATUS"
-```
-
-All three should return 200 or 302.
-
----
-
-## Phase 10: Return URL to Orchestrator
-
-When all checks pass, output clearly:
-
-```
-CMS deployment complete.
-Railway URL: {railway_url}
-Admin panel: {railway_url}/admin
-API base: {railway_url}/api
-
-Collections available:
-  - Services: {railway_url}/api/services
-  - Posts: {railway_url}/api/posts
-  - Testimonials: {railway_url}/api/testimonials
-  - Pricing: {railway_url}/api/pricing-tiers
-  - Site settings: {railway_url}/api/globals/site-settings
+# Keystatic CMS (GitHub mode — set these in Cloudflare Pages env vars for production)
+GITHUB_REPO_OWNER=your-github-username
+GITHUB_REPO_NAME=your-repo-name
+PUBLIC_BRAND_NAME=Your Brand Name
+KEYSTATIC_GITHUB_CLIENT_ID=from-github-oauth-app
+KEYSTATIC_GITHUB_CLIENT_SECRET=from-github-oauth-app
+KEYSTATIC_SECRET=random-string-min-32-chars
 ```
 
 ---
 
-## Troubleshooting
+## Phase 7: Print GitHub OAuth Instructions
 
-**"Cannot connect to database"** — Railway PostgreSQL is still provisioning. Wait 60 seconds, then run `railway up --detach` again.
+Print this block clearly so the user knows what to do after deployment:
 
-**"PAYLOAD_SECRET is required"** — Run `railway variables set PAYLOAD_SECRET="$(openssl rand -hex 32)"` then redeploy.
+```
+========================================
+AFTER DEPLOYMENT: Set up CMS login
+========================================
 
-**"create-payload-app not found"** — Run `npx create-payload-app@latest` directly (npx will download it).
+To enable the admin UI on your live site, create a GitHub OAuth App:
 
-**"Module not found: @payloadcms/db-postgres"** — Run `cd cms && npm install @payloadcms/db-postgres` then redeploy.
+1. Go to: https://github.com/settings/developers
+2. Click "New OAuth App"
+3. Fill in:
+   Application name:  {brand_name} CMS
+   Homepage URL:      https://{brand_slug}-site.pages.dev
+   Callback URL:      https://{brand_slug}-site.pages.dev/api/keystatic/github/oauth/callback
 
-**Railway build fails with out-of-memory** — Railway free tier has 512MB RAM. Add `NODE_OPTIONS=--max-old-space-size=384` to Railway environment variables.
+4. Copy the Client ID and generate a Client Secret
 
-**"First user page not showing"** — The database was already seeded. Check `{railway_url}/api/users` to see if users exist. If yes, use the login page instead.
+5. In Cloudflare Pages dashboard (your project > Settings > Environment Variables), add:
+   GITHUB_REPO_OWNER          = your-github-username
+   GITHUB_REPO_NAME           = {brand_slug}-site
+   PUBLIC_BRAND_NAME          = {brand_name}
+   KEYSTATIC_GITHUB_CLIENT_ID = (Client ID from step 4)
+   KEYSTATIC_GITHUB_CLIENT_SECRET = (Client Secret from step 4)
+   KEYSTATIC_SECRET           = (run: openssl rand -hex 32)
 
-**Admin UI shows blank page** — Check Railway logs: `railway logs`. Usually a missing env var or database connection issue.
+6. Redeploy the site — Cloudflare will pick up the new env vars
+
+Your CMS admin will be at: https://{brand_slug}-site.pages.dev/keystatic
+Local dev admin:           http://localhost:4321/keystatic
+========================================
+```
+
+---
+
+## Phase 8: Build Verification
+
+```bash
+npm run build
+```
+
+Must exit with code 0. Common errors:
+
+**"Cannot find module '@keystatic/astro'"** — run `npm install @keystatic/core @keystatic/astro` again.
+
+**"output must be 'server' or 'hybrid'"** — update `output` in astro.config (Phase 3).
+
+**"No adapter configured"** — add `adapter: cloudflare()` and import to astro.config.
+
+**TypeScript error on `storage` variable** — the `as const` assertions on both branches are required.
+
+**"prerender is not exported"** — ensure both route files from Phase 4 have `export const prerender = false`.
+
+---
+
+## Completion Output
+
+```
+CMS setup complete.
+Type: Keystatic (git-based, Cloudflare-native, no separate server)
+Local dev admin: http://localhost:4321/keystatic
+Live admin (after deploy + OAuth setup): https://{brand_slug}-site.pages.dev/keystatic
+Content lives in: src/content/
+Build: PASS
+```

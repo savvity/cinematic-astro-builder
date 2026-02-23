@@ -115,7 +115,7 @@ uv run ~/.claude/skills/nano-banana-pro/scripts/generate_image.py \
   --prompt "PROMPT" \
   --filename "public/images/NAME.png" \
   --resolution RESOLUTION \
-  --api-key "AIzaSyA4uqeHjeYN34uzyRptCfl9pDSIEg_ujac"
+  --api-key "$GEMINI_API_KEY"
 
 python3 -c "
 from PIL import Image

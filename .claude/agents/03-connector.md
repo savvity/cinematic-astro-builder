@@ -1,388 +1,285 @@
 ---
 name: connector
-description: Connects the built Astro site to the Payload CMS Railway deployment. Creates a typed REST API client with local data fallbacks, updates all pages to pull from CMS when available, and wires the CMS URL into environment configuration.
+description: Updates Astro pages to read content from Keystatic using the createReader API. Replaces any static data imports in blog, services, and testimonials pages with live Keystatic reader calls. No API calls, no network requests — Keystatic reads directly from the content files at build time.
 tools: Bash, Read, Write, Edit, Glob, Grep
 model: sonnet
 ---
 
-# Connector Agent
+# Connector Agent — Keystatic Reader
 
-You wire the Astro site to Payload CMS. You do not build new pages — you update existing ones to fetch from the CMS API when `PAYLOAD_CMS_URL` is set, and fall back to local static data when it is not.
+You update the Astro site's pages to read content from Keystatic's content files using `createReader`. This is a build-time operation — no network requests, no API keys, no external services. Keystatic reads YAML/Markdown files from `src/content/` directly.
 
-Read the spawn prompt carefully. Extract:
-- `railway_url` — the Railway public URL (e.g., `https://nura-cms.up.railway.app`)
-- `brand_name` — the brand name (used to find the Astro project directory)
-
----
-
-## Phase 1: Locate the Astro Project
-
-```bash
-# Find the Astro project directory
-ls -d */  # list directories in current folder
-```
-
-The Astro site is in a directory named `{brand_slug}-site/`. If you can't find it, look for `astro.config.mjs` or `astro.config.ts`:
-
+Find the Astro project:
 ```bash
 find . -name "astro.config.*" -maxdepth 3 2>/dev/null
 ```
 
-Work from the Astro site directory for all remaining steps.
+Work from inside the project directory.
 
 ---
 
-## Phase 2: Create the Payload API Client
+## How Keystatic Reader Works
 
-Write `src/lib/payload.ts` with a fully typed REST client and fallback to local data:
+```typescript
+import { createReader } from '@keystatic/core/reader'
+import keystaticConfig from '../../keystatic.config'
+
+// createReader reads from the file system at build time
+const reader = createReader(process.cwd(), keystaticConfig)
+
+// Read all posts
+const posts = await reader.collections.posts.all()
+
+// Read a single post by slug
+const post = await reader.collections.posts.read('welcome')
+
+// Read a singleton
+const settings = await reader.singletons.siteSettings.read()
+```
+
+The `reader.collections.posts.all()` call returns an array of entries. Each entry has:
+- `slug` — the file slug (filename without extension)
+- `entry` — the frontmatter fields as typed objects
+- To get the content body: `await entry.content()` (returns Markdoc AST)
+
+---
+
+## Phase 1: Create the Reader Utility
+
+Write `src/lib/content.ts` to centralise all content reads:
 
 ```typescript
 /**
- * Payload CMS REST API client.
- *
- * When PAYLOAD_CMS_URL is set (production/preview), fetches live CMS data.
- * When not set (local dev or build without CMS), falls back to local static data.
- *
- * All functions are safe to call unconditionally — they never throw.
+ * Keystatic content reader.
+ * Reads from src/content/ files at build time. No network, no API.
  */
+import { createReader } from '@keystatic/core/reader'
+import keystaticConfig from '../../keystatic.config'
 
-const CMS_URL = import.meta.env.PAYLOAD_CMS_URL || ''
-const API = CMS_URL ? `${CMS_URL}/api` : ''
+const reader = createReader(process.cwd(), keystaticConfig)
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Posts ────────────────────────────────────────────────────────────────────
 
-export interface CMSService {
-  id: string
-  title: string
+export interface Post {
   slug: string
-  shortDescription: string
-  description: string  // Lexical richtext JSON — convert to HTML for rendering
+  title: string
+  publishedDate: string
+  excerpt?: string
+  author?: string
+  featuredImage?: string
+  metaDescription?: string
+}
+
+export async function getAllPosts(): Promise<Post[]> {
+  const entries = await reader.collections.posts.all()
+
+  const posts = entries
+    .map((entry) => ({
+      slug: entry.slug,
+      title: entry.entry.title,
+      publishedDate: entry.entry.publishedDate || '',
+      excerpt: entry.entry.excerpt || undefined,
+      author: entry.entry.author || undefined,
+      featuredImage: entry.entry.featuredImage || undefined,
+      metaDescription: entry.entry.metaDescription || undefined,
+    }))
+    .filter((p) => p.publishedDate) // only posts with a date
+    .sort((a, b) => b.publishedDate.localeCompare(a.publishedDate)) // newest first
+
+  return posts
+}
+
+export async function getPostBySlug(slug: string): Promise<(Post & { content: unknown }) | null> {
+  const entry = await reader.collections.posts.read(slug)
+  if (!entry) return null
+
+  return {
+    slug,
+    title: entry.title,
+    publishedDate: entry.publishedDate || '',
+    excerpt: entry.excerpt || undefined,
+    author: entry.author || undefined,
+    featuredImage: entry.featuredImage || undefined,
+    metaDescription: entry.metaDescription || undefined,
+    content: await entry.content(),
+  }
+}
+
+// ─── Services ─────────────────────────────────────────────────────────────────
+
+export interface Service {
+  slug: string
+  title: string
+  shortDescription?: string
   icon?: string
-  image?: { url: string; alt: string; width?: number; height?: number }
   featured: boolean
   order: number
   metaDescription?: string
 }
 
-export interface CMSPost {
-  id: string
-  title: string
-  slug: string
-  status: 'draft' | 'published'
-  publishedDate?: string
-  author?: string
-  excerpt?: string
-  featuredImage?: { url: string; alt: string; width?: number; height?: number }
-  content: string  // Lexical richtext JSON
-  tags?: { tag: string }[]
-  metaDescription?: string
-  ogImage?: { url: string; alt: string }
+export async function getAllServices(): Promise<Service[]> {
+  const entries = await reader.collections.services.all()
+
+  return entries
+    .map((entry) => ({
+      slug: entry.slug,
+      title: entry.entry.title,
+      shortDescription: entry.entry.shortDescription || undefined,
+      icon: entry.entry.icon || undefined,
+      featured: entry.entry.featured ?? false,
+      order: entry.entry.order ?? 0,
+      metaDescription: entry.entry.metaDescription || undefined,
+    }))
+    .sort((a, b) => a.order - b.order)
 }
 
-export interface CMSTestimonial {
-  id: string
+export async function getFeaturedServices(): Promise<Service[]> {
+  const all = await getAllServices()
+  return all.filter((s) => s.featured)
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+
+export interface Testimonial {
+  slug: string
   authorName: string
   authorTitle?: string
   company?: string
-  avatar?: { url: string; alt: string }
   quote: string
   rating: number
   featured: boolean
   order: number
+  avatar?: string
 }
 
-export interface CMSPricingTier {
-  id: string
-  name: string
-  price: string
-  description: string
-  features: { feature: string; included: boolean }[]
-  ctaLabel: string
-  ctaUrl: string
-  featured: boolean
-  badge?: string
-  order: number
+export async function getAllTestimonials(): Promise<Testimonial[]> {
+  const entries = await reader.collections.testimonials.all()
+
+  return entries
+    .map((entry) => ({
+      slug: entry.slug,
+      authorName: entry.entry.authorName,
+      authorTitle: entry.entry.authorTitle || undefined,
+      company: entry.entry.company || undefined,
+      quote: entry.entry.quote,
+      rating: entry.entry.rating ?? 5,
+      featured: entry.entry.featured ?? false,
+      order: entry.entry.order ?? 0,
+      avatar: entry.entry.avatar || undefined,
+    }))
+    .sort((a, b) => a.order - b.order)
 }
 
-export interface CMSSiteSettings {
+export async function getFeaturedTestimonials(): Promise<Testimonial[]> {
+  const all = await getAllTestimonials()
+  return all.filter((t) => t.featured)
+}
+
+// ─── Site Settings ────────────────────────────────────────────────────────────
+
+export interface SiteSettings {
   brandName: string
   tagline?: string
-  domain?: string
-  primaryCta?: string
-  primaryCtaUrl?: string
   email?: string
   phone?: string
   address?: string
-  socialLinks?: {
-    twitter?: string
-    linkedin?: string
-    instagram?: string
-    facebook?: string
-  }
+  primaryCtaLabel?: string
+  primaryCtaUrl?: string
+  twitterUrl?: string
+  linkedinUrl?: string
+  instagramUrl?: string
   defaultMetaDescription?: string
-  ogImage?: { url: string; alt: string }
   googleAnalyticsId?: string
 }
 
-// ─── Generic fetcher ─────────────────────────────────────────────────────────
-
-async function fetchFromCMS<T>(endpoint: string): Promise<T | null> {
-  if (!API) return null
-
+export async function getSiteSettings(): Promise<SiteSettings | null> {
   try {
-    const res = await fetch(`${API}${endpoint}`, {
-      headers: { 'Content-Type': 'application/json' },
-      // Don't cache at the fetch level — Astro handles caching
-    })
+    const settings = await reader.singletons.siteSettings.read()
+    if (!settings) return null
 
-    if (!res.ok) {
-      console.warn(`[CMS] ${endpoint} returned ${res.status}`)
-      return null
+    return {
+      brandName: settings.brandName || '',
+      tagline: settings.tagline || undefined,
+      email: settings.email || undefined,
+      phone: settings.phone || undefined,
+      address: settings.address || undefined,
+      primaryCtaLabel: settings.primaryCtaLabel || undefined,
+      primaryCtaUrl: settings.primaryCtaUrl || '/contact',
+      twitterUrl: settings.twitterUrl || undefined,
+      linkedinUrl: settings.linkedinUrl || undefined,
+      instagramUrl: settings.instagramUrl || undefined,
+      defaultMetaDescription: settings.defaultMetaDescription || undefined,
+      googleAnalyticsId: settings.googleAnalyticsId || undefined,
     }
-
-    return (await res.json()) as T
-  } catch (err) {
-    console.warn(`[CMS] Failed to fetch ${endpoint}:`, err)
+  } catch {
     return null
   }
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+// ─── Pricing ──────────────────────────────────────────────────────────────────
 
-/**
- * Returns all featured services, sorted by order.
- * Falls back to local services data if CMS unavailable.
- */
-export async function getServices(): Promise<CMSService[]> {
-  const data = await fetchFromCMS<{ docs: CMSService[] }>('/services?limit=50&sort=order')
-
-  if (data?.docs?.length) {
-    return data.docs
-  }
-
-  // Fallback to local static data
-  const { services: localServices } = await import('./localData')
-  return localServices as CMSService[]
+export interface PricingTier {
+  name: string
+  price: string
+  description: string
+  featured: boolean
+  badge?: string
+  ctaLabel: string
+  ctaUrl: string
+  features: { feature: string; included: boolean }[]
 }
 
-/**
- * Returns all published posts, sorted newest first.
- * Falls back to local posts data if CMS unavailable.
- */
-export async function getPublishedPosts(): Promise<CMSPost[]> {
-  const data = await fetchFromCMS<{ docs: CMSPost[] }>(
-    '/posts?where[status][equals]=published&sort=-publishedDate&limit=50'
-  )
+export async function getPricingTiers(): Promise<PricingTier[]> {
+  try {
+    const data = await reader.singletons.pricingTiers.read()
+    if (!data?.tiers) return []
 
-  if (data?.docs?.length) {
-    return data.docs
+    return data.tiers.map((tier) => ({
+      name: tier.name,
+      price: tier.price,
+      description: tier.description,
+      featured: tier.featured ?? false,
+      badge: tier.badge || undefined,
+      ctaLabel: tier.ctaLabel || 'Get started',
+      ctaUrl: tier.ctaUrl || '/contact',
+      features: (tier.features || []).map((f) => ({
+        feature: f.feature,
+        included: f.included ?? true,
+      })),
+    }))
+  } catch {
+    return []
   }
-
-  const { posts: localPosts } = await import('./localData')
-  return localPosts as CMSPost[]
-}
-
-/**
- * Returns a single published post by slug.
- * Falls back to local posts data if CMS unavailable.
- */
-export async function getPostBySlug(slug: string): Promise<CMSPost | null> {
-  const data = await fetchFromCMS<{ docs: CMSPost[] }>(
-    `/posts?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&limit=1`
-  )
-
-  if (data?.docs?.[0]) {
-    return data.docs[0]
-  }
-
-  const { posts: localPosts } = await import('./localData')
-  return (localPosts as CMSPost[]).find((p) => p.slug === slug) || null
-}
-
-/**
- * Returns all featured testimonials, sorted by order.
- * Falls back to local testimonials data if CMS unavailable.
- */
-export async function getTestimonials(): Promise<CMSTestimonial[]> {
-  const data = await fetchFromCMS<{ docs: CMSTestimonial[] }>(
-    '/testimonials?where[featured][equals]=true&sort=order&limit=20'
-  )
-
-  if (data?.docs?.length) {
-    return data.docs
-  }
-
-  const { testimonials: localTestimonials } = await import('./localData')
-  return localTestimonials as CMSTestimonial[]
-}
-
-/**
- * Returns all pricing tiers, sorted by order.
- * Falls back to local pricing data if CMS unavailable.
- */
-export async function getPricingTiers(): Promise<CMSPricingTier[]> {
-  const data = await fetchFromCMS<{ docs: CMSPricingTier[] }>(
-    '/pricing-tiers?sort=order&limit=10'
-  )
-
-  if (data?.docs?.length) {
-    return data.docs
-  }
-
-  const { pricingTiers: localTiers } = await import('./localData')
-  return localTiers as CMSPricingTier[]
-}
-
-/**
- * Returns global site settings.
- * Falls back to local brand data if CMS unavailable.
- */
-export async function getSiteSettings(): Promise<CMSSiteSettings | null> {
-  const data = await fetchFromCMS<CMSSiteSettings>('/globals/site-settings')
-
-  if (data?.brandName) {
-    return data
-  }
-
-  const { brand } = await import('./brand')
-  return {
-    brandName: brand.name,
-    tagline: brand.tagline,
-    domain: brand.domain,
-    primaryCta: brand.cta,
-    primaryCtaUrl: '/contact',
-  } as CMSSiteSettings
 }
 ```
 
 ---
 
-## Phase 3: Create Local Data Fallback File
+## Phase 2: Update Blog Pages
 
-The `getServices()` etc. functions import from `'./localData'`. Create this file to re-export the existing static data in a CMS-compatible shape.
-
-Read the existing data files first:
-```bash
-ls src/data/
-```
-
-Look for `services.ts`, `posts.ts`, `testimonials.ts`, or similar. If they exist, map them. If the Astro site uses different structures, adapt.
-
-Write `src/lib/localData.ts`:
-```typescript
-/**
- * Local static data used as fallback when PAYLOAD_CMS_URL is not set.
- * Maps project-specific data structures to CMS-compatible shapes.
- */
-
-// Import from wherever the builder put the static data
-// Adjust these imports to match the actual file paths in src/data/
-import { brand } from './brand'
-
-export const services = [
-  // These are populated by the builder agent from the 3 value propositions
-  // If src/data/services.ts exists, import and re-export it here
-]
-
-export const posts: unknown[] = []
-
-export const testimonials = [
-  {
-    id: 'local-1',
-    authorName: 'Sample Client',
-    authorTitle: 'CEO',
-    company: 'Example Co',
-    quote: `Working with ${brand.name} transformed how we approach our goals. The results speak for themselves.`,
-    rating: 5,
-    featured: true,
-    order: 0,
-  },
-]
-
-export const pricingTiers = [
-  {
-    id: 'essential',
-    name: 'Essential',
-    price: 'Contact us',
-    description: 'Perfect for getting started.',
-    features: [
-      { feature: 'Initial consultation', included: true },
-      { feature: 'Core services', included: true },
-      { feature: 'Email support', included: true },
-      { feature: 'Priority access', included: false },
-    ],
-    ctaLabel: 'Get started',
-    ctaUrl: '/contact',
-    featured: false,
-    order: 0,
-  },
-  {
-    id: 'performance',
-    name: 'Performance',
-    price: 'Contact us',
-    description: 'For serious results.',
-    features: [
-      { feature: 'Everything in Essential', included: true },
-      { feature: 'Priority scheduling', included: true },
-      { feature: 'Dedicated support', included: true },
-      { feature: 'Custom reporting', included: true },
-    ],
-    ctaLabel: 'Get started',
-    ctaUrl: '/contact',
-    featured: true,
-    badge: 'Most Popular',
-    order: 1,
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 'Custom',
-    description: 'For organizations at scale.',
-    features: [
-      { feature: 'Everything in Performance', included: true },
-      { feature: 'Custom integrations', included: true },
-      { feature: 'SLA guarantees', included: true },
-      { feature: 'Dedicated account manager', included: true },
-    ],
-    ctaLabel: 'Contact sales',
-    ctaUrl: '/contact',
-    featured: false,
-    order: 2,
-  },
-]
-```
-
-If `src/data/services.ts` already exists with service data from the builder, import it into `localData.ts` instead of using empty arrays.
-
----
-
-## Phase 4: Update Pages to Use CMS Data
-
-### Blog Index Page
-
-Read the existing blog index page:
+Find existing blog pages:
 ```bash
 find src/pages -name "*.astro" | xargs grep -l "blog\|post" -i 2>/dev/null
 ```
 
-For each blog-related page found, add the CMS import if it's not already there. In the page frontmatter (`---` section), add:
+### Blog index page (`src/pages/blog/index.astro` or `src/pages/blog.astro`)
 
+In the frontmatter, replace any static post array with:
 ```typescript
-import { getPublishedPosts } from '../lib/payload'
-const posts = await getPublishedPosts()
+import { getAllPosts } from '../lib/content'
+// or '../../lib/content' if in a subdirectory
+
+const posts = await getAllPosts()
 ```
 
-Replace any existing static post array with the `posts` variable from CMS.
+### Blog post page (`src/pages/blog/[slug].astro`)
 
-### Blog Post Page (dynamic route)
-
-For `src/pages/blog/[slug].astro` or equivalent, update `getStaticPaths()`:
-
+Replace `getStaticPaths` with:
 ```typescript
-import { getPublishedPosts, getPostBySlug } from '../../lib/payload'
+import { getAllPosts, getPostBySlug } from '../../lib/content'
 
 export async function getStaticPaths() {
-  const posts = await getPublishedPosts()
+  const posts = await getAllPosts()
   return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
@@ -390,128 +287,91 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params
-const { post } = Astro.props
+const post = await getPostBySlug(slug)
+if (!post) return Astro.redirect('/blog')
 ```
 
-### Services Page
+To render Markdoc content in the template:
+```astro
+---
+import { Markdoc } from '@astrojs/markdoc'
+---
 
-For `src/pages/services.astro` or equivalent:
+<article class="prose">
+  <Markdoc content={post.content} />
+</article>
+```
+
+---
+
+## Phase 3: Update Services Page
+
+Find services page:
+```bash
+find src/pages -name "services*" 2>/dev/null
+```
+
+In the frontmatter:
+```typescript
+import { getAllServices } from '../lib/content'
+const services = await getAllServices()
+```
+
+---
+
+## Phase 4: Update Any Testimonials Section
+
+Search for testimonial data usage:
+```bash
+grep -rn "testimonial" src/ --include="*.astro" -l 2>/dev/null
+```
+
+For each file found, replace the static testimonials array with:
+```typescript
+import { getFeaturedTestimonials } from '../lib/content'
+const testimonials = await getFeaturedTestimonials()
+```
+
+---
+
+## Phase 5: Make Pages Prerender-Safe
+
+Keystatic reader runs at build time, which is fine for static pages. However, if any page was changed to use server rendering during cms-builder Phase 3 (`output: 'hybrid'`), ensure content pages still prerender:
 
 ```typescript
-import { getServices } from '../lib/payload'
-const services = await getServices()
+// At the top of each content page (blog, services, etc.)
+export const prerender = true
 ```
 
-### Testimonials (if in a component or page)
-
-```typescript
-import { getTestimonials } from '../lib/payload'
-const testimonials = await getTestimonials()
-```
-
-For each page update, do not restructure the page — only change the data source. Keep all HTML/Astro template code identical.
+The only pages that should NOT have `prerender = true` are the Keystatic admin routes (already handled by their own export).
 
 ---
 
-## Phase 5: Update Environment Configuration
-
-### Add to `.env` in the Astro project
-```bash
-# Append to .env (do not overwrite)
-echo "" >> .env
-echo "# Payload CMS" >> .env
-echo "PAYLOAD_CMS_URL={railway_url}" >> .env
-```
-
-### Add to `.env.example`
-```bash
-echo "" >> .env.example
-echo "# Payload CMS (optional — falls back to local data if not set)" >> .env.example
-echo "PAYLOAD_CMS_URL=https://your-cms.up.railway.app" >> .env.example
-```
-
-### Add to `astro.config.mjs` or `astro.config.ts`
-
-Read the current astro config:
-```bash
-cat astro.config.mjs 2>/dev/null || cat astro.config.ts 2>/dev/null
-```
-
-Add `PAYLOAD_CMS_URL` to the `vite.define` or `env` section so it's available at build time. In Astro 5, environment variables prefixed with nothing are server-only. `import.meta.env.PAYLOAD_CMS_URL` works if defined in `.env`.
-
-If the config has a `vite:` key, add:
-```javascript
-vite: {
-  // ... existing vite config ...
-  define: {
-    // already defined vars
-  }
-}
-```
-
-Actually for Astro 5, `import.meta.env.PAYLOAD_CMS_URL` works automatically from `.env` without any config changes. No edit needed to astro.config if it's already there.
-
-### Add to Cloudflare Pages via Wrangler
-
-```bash
-# Add the secret to Cloudflare Pages (production environment)
-echo "{railway_url}" | wrangler pages secret put PAYLOAD_CMS_URL --project-name={brand_slug}-site
-```
-
----
-
-## Phase 6: Verify Connection
-
-Run a connection test:
-
-```bash
-python3 -c "
-import urllib.request, json, sys
-
-url = '{railway_url}/api/globals/site-settings'
-try:
-    response = urllib.request.urlopen(url, timeout=10)
-    data = json.loads(response.read().decode())
-    print('CMS connected. Brand name:', data.get('brandName', '(not set)'))
-except Exception as e:
-    print('CMS connection failed:', e)
-    sys.exit(1)
-"
-```
-
-If this fails, check:
-1. Is the Railway URL correct?
-2. Is the Railway deploy still running? (`railway status`)
-3. Did the cms-builder agent complete Phase 7 successfully?
-
----
-
-## Phase 7: Build Verification
+## Phase 6: Build Verification
 
 ```bash
 npm run build
 ```
 
-The build must complete with zero errors. If errors occur:
+Must exit with code 0. Common errors:
 
-- `"Cannot find module '../lib/payload'"` — check the import path. Astro pages in `src/pages/` import as `'../lib/payload'`, in `src/pages/blog/` as `'../../lib/payload'`.
-- `"Type error: Property 'X' does not exist on type 'CMSPost'"` — add the missing property to the interface in `src/lib/payload.ts`.
-- `"'import.meta.env.PAYLOAD_CMS_URL' is possibly undefined"` — add `|| ''` to the assignment: `const CMS_URL = import.meta.env.PAYLOAD_CMS_URL || ''`.
-- `"Cannot import './localData'"` — make sure `src/lib/localData.ts` exists (Phase 3 above).
+**"Cannot find module '@keystatic/core/reader'"** — run `npm install @keystatic/core` again.
 
-Fix all errors before finishing. Do not report success until `npm run build` exits with code 0.
+**"createReader is not a function"** — ensure the import is from `'@keystatic/core/reader'` (not `'@keystatic/core'`).
+
+**"reader.collections.posts is undefined"** — the collection name in the reader call must exactly match the key in `keystatic.config.ts`. Check that `posts`, `services`, and `testimonials` match.
+
+**"Cannot read properties of null (entry is null)"** — the content file may be malformed. Check `src/content/posts/welcome.mdoc` exists and has valid frontmatter.
+
+**TypeScript: "entry.content is not a function"** — richtext/markdoc fields return a function, not a value. Call `await entry.content()` (with parentheses).
 
 ---
 
 ## Completion Output
 
-When all phases are done and the build passes:
-
 ```
 Connector complete.
-Payload CMS URL wired: {railway_url}
-API client: src/lib/payload.ts
-Local fallback: src/lib/localData.ts
-Pages updated: [list each page file you modified]
+Reader utility: src/lib/content.ts
+Pages updated: [list each page file modified]
 Build: PASS (zero errors)
 ```

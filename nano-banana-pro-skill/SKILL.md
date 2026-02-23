@@ -39,16 +39,20 @@ Map user requests to API parameters:
 
 ## API Key
 
-**Default API Key:** `AIzaSyA4uqeHjeYN34uzyRptCfl9pDSIEg_ujac`
+Get a free Gemini API key at: https://aistudio.google.com/apikey
 
 The script checks for API key in this order:
-1. `--api-key` argument (use if user provided key in chat)
+1. `--api-key` argument
 2. `GEMINI_API_KEY` environment variable
-3. Default key configured above
 
-When using the skill, pass the API key:
+Set the environment variable (recommended):
 ```bash
---api-key "AIzaSyA4uqeHjeYN34uzyRptCfl9pDSIEg_ujac"
+export GEMINI_API_KEY="your-key-here"
+```
+
+Or pass it directly per call:
+```bash
+--api-key "your-key-here"
 ```
 
 ## Filename Generation
