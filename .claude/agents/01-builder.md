@@ -903,6 +903,101 @@ Each `data-stack-card` section is `100dvh` with a background image at `opacity-2
 
 ---
 
+## Phase 8c: Contact API Route
+
+Write `src/pages/api/contact.ts`. Replace `BRAND_NAME` with the actual brand name and `DOMAIN_URL` with the actual domain (from the orchestrator's spawn prompt) before writing the file.
+
+```typescript
+import type { APIRoute } from 'astro'
+
+export const prerender = false
+
+export const POST: APIRoute = async ({ request }) => {
+  const headers = { 'Content-Type': 'application/json' }
+
+  try {
+    const body = await request.json()
+    const { name, email, phone, message, _gotcha } = body as Record<string, string>
+
+    // Honeypot: bots fill hidden fields, humans don't. Silently succeed to avoid training bots.
+    if (_gotcha) {
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+    }
+
+    if (!name?.trim() || !email?.trim() || !message?.trim()) {
+      return new Response(JSON.stringify({ error: 'Name, email, and message are required.' }), { status: 400, headers })
+    }
+
+    const resendKey = import.meta.env.RESEND_API_KEY as string | undefined
+    const contactEmail = import.meta.env.CONTACT_EMAIL as string | undefined
+
+    if (!resendKey || !contactEmail) {
+      console.log('[contact] RESEND not configured. Submission:', { name, email, phone, message })
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+    }
+
+    const ownerHtml = `
+      <h2>New contact from BRAND_NAME website</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+      <p><strong>Message:</strong></p>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+    `
+
+    const confirmHtml = `
+      <h2>Thanks for reaching out, ${name}.</h2>
+      <p>We received your message and will be in touch within 24 hours.</p>
+      <p>Here is a copy of what you sent:</p>
+      <blockquote style="border-left: 3px solid #ccc; padding-left: 1rem; color: #555; margin: 1rem 0;">
+        ${message.replace(/\n/g, '<br>')}
+      </blockquote>
+      <p>Talk soon,<br>The BRAND_NAME team</p>
+    `
+
+    // Send both emails in parallel
+    const [ownerRes] = await Promise.all([
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'BRAND_NAME <noreply@DOMAIN_URL>',
+          to: [contactEmail],
+          reply_to: email,
+          subject: `New enquiry from ${name}`,
+          html: ownerHtml,
+        }),
+      }),
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'BRAND_NAME <noreply@DOMAIN_URL>',
+          to: [email],
+          reply_to: contactEmail,
+          subject: `We received your message`,
+          html: confirmHtml,
+        }),
+      }),
+    ])
+
+    if (!ownerRes.ok) {
+      console.error('[contact] Resend error:', ownerRes.status, await ownerRes.text())
+      return new Response(JSON.stringify({ error: 'Failed to send. Please try again.' }), { status: 500, headers })
+    }
+
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+  } catch (err) {
+    console.error('[contact] Unexpected error:', err)
+    return new Response(JSON.stringify({ error: 'Internal server error.' }), { status: 500, headers })
+  }
+}
+```
+
+**Important:** Replace `BRAND_NAME` with the actual brand name (e.g., `Nura Health`) and `DOMAIN_URL` with the bare domain without `https://` (e.g., `nurahealth.com`). The `from` field must use a domain that will be verified in Resend.
+
+---
+
 ## Phase 9: All Pages With Schema
 
 Every page imports its schema builder and passes the result to BaseLayout. Non-negotiable.
@@ -949,6 +1044,162 @@ Repeat the pattern for every page. Schema function mapping:
 | `blog/[slug].astro` | `blogPostSchema(brand, post)` + `breadcrumbSchema(...)` | `Post Title — Brand` |
 
 Create 2-3 real blog posts as `.md` files in `src/content/blog/` using the brand's industry for topic relevance.
+
+### Contact Page Form
+
+When writing `contact.astro`, include a `Phone` field (optional, between Email and Message) and wire the form to the real API route with loading and error states. The form must have `id="contact-form"` and a status `<p id="form-status">` element. Replace `CTA_TEXT` with the actual CTA text from the spawn prompt.
+
+```html
+<form id="contact-form" class="space-y-6">
+  <div>
+    <label for="name" class="block text-sm font-semibold mb-2">Name</label>
+    <input id="name" name="name" type="text" required
+      class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-[var(--color-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+  </div>
+  <div>
+    <label for="email" class="block text-sm font-semibold mb-2">Email</label>
+    <input id="email" name="email" type="email" required
+      class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-[var(--color-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+  </div>
+  <div>
+    <label for="phone" class="block text-sm font-semibold mb-2">Phone <span class="font-normal opacity-50">(optional)</span></label>
+    <input id="phone" name="phone" type="tel"
+      class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-[var(--color-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+  </div>
+  <div>
+    <label for="message" class="block text-sm font-semibold mb-2">Message</label>
+    <textarea id="message" name="message" rows="5" required
+      class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-[var(--color-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none"></textarea>
+  </div>
+  <!-- Honeypot: hidden from humans, bots fill it. Must stay empty for submission to proceed. -->
+  <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  <button type="submit"
+    class="btn-magnetic w-full bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold text-lg">
+    <span class="relative z-10">CTA_TEXT</span>
+    <span class="btn-bg bg-[var(--color-dark)] rounded-full"></span>
+  </button>
+  <p id="form-status" class="hidden text-center text-sm font-medium"></p>
+</form>
+```
+
+Form script (in a `<script>` tag at the bottom of `contact.astro`):
+
+```typescript
+const form = document.getElementById('contact-form') as HTMLFormElement
+const status = document.getElementById('form-status')
+const submitBtn = form?.querySelector('button[type="submit"]') as HTMLButtonElement
+
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  if (!submitBtn || !status) return
+
+  submitBtn.disabled = true
+  submitBtn.querySelector('span.relative')!.textContent = 'Sending...'
+  status.classList.add('hidden')
+
+  const data = Object.fromEntries(new FormData(form))
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+
+    const json = await res.json()
+
+    if (!res.ok || json.error) {
+      status.textContent = json.error || 'Something went wrong. Please try again.'
+      status.style.color = 'var(--color-accent)'
+      status.classList.remove('hidden')
+    } else {
+      status.textContent = 'Message sent! We will be in touch within 24 hours.'
+      status.style.color = 'var(--color-accent)'
+      status.classList.remove('hidden')
+      form.reset()
+    }
+  } catch {
+    status.textContent = 'Network error. Please check your connection and try again.'
+    status.style.color = 'var(--color-accent)'
+    status.classList.remove('hidden')
+  } finally {
+    submitBtn.disabled = false
+    submitBtn.querySelector('span.relative')!.textContent = 'CTA_TEXT'
+  }
+})
+```
+
+Replace `CTA_TEXT` with the actual CTA text from the spawn prompt (e.g., "Book a free consultation").
+
+---
+
+## Phase 9b: Environment Files
+
+Write `.env.example` (documents required secrets for contributors):
+
+```
+# Contact form email notifications (via Resend)
+# See: https://resend.com > API Keys
+RESEND_API_KEY=re_your_key_here
+
+# Email address that receives contact form submissions
+CONTACT_EMAIL=your@email.com
+```
+
+Read `.gitignore` if it exists, then ensure `.env` is listed. If no `.gitignore` exists, create one:
+
+```
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables (never commit)
+.env
+.env.local
+.dev.vars
+```
+
+---
+
+## Phase 9c: 404 Page
+
+Write `src/pages/404.astro`. Astro and Cloudflare Pages both serve this automatically for any unmatched URL.
+
+```astro
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/sections/Navbar.astro';
+import Footer from '../components/sections/Footer.astro';
+import { brand } from '../data/brand';
+import { Icon } from 'astro-icon/components';
+---
+<BaseLayout
+  title={`Page Not Found — ${brand.name}`}
+  description="The page you're looking for doesn't exist."
+>
+  <Navbar />
+  <main class="min-h-[70vh] flex items-center justify-center px-8 py-32">
+    <div class="text-center max-w-lg">
+      <p class="font-mono text-[var(--color-accent)] text-sm tracking-widest mb-4">404</p>
+      <h1 class="font-drama italic text-[clamp(2.5rem,6vw,4.5rem)] leading-tight mb-6">
+        Page not found.
+      </h1>
+      <p class="opacity-60 mb-10 text-lg">
+        The page you're looking for doesn't exist or may have moved.
+      </p>
+      <a href="/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold text-lg">
+        <span class="relative z-10 flex items-center gap-2">
+          Back to home <Icon name="ph:arrow-right-bold" class="size-5" />
+        </span>
+        <span class="btn-bg bg-[var(--color-dark)] rounded-full"></span>
+      </a>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+```
 
 ---
 

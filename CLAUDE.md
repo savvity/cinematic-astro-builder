@@ -110,6 +110,9 @@ Example: nurahealth.com — used for canonical URLs and sitemap. Use a placehold
 - Yes — add Keystatic CMS (edit content from a browser, no code needed, hosted on Cloudflare)
 - No — static only (content is in code, rebuild to change it)
 
+**Question 7 (header: "Notifications"):** "What email address should receive contact form enquiries?"
+Example: hello@aceplumbing.com — this is where leads go, not displayed on the site.
+
 ---
 
 ## Step 3: Agent Spawn Sequence
@@ -123,6 +126,7 @@ Extract from answers:
 - `{cta}` — primary call to action
 - `{domain}` — the domain name
 - `{needs_cms}` — true or false
+- `{contact_email}` — email address for contact form notifications
 
 ### Agent 1: builder (always runs)
 
@@ -138,6 +142,7 @@ Value prop 3: {vp3}
 CTA: {cta}
 Domain: {domain}
 Needs CMS: {needs_cms}
+Contact email: {contact_email}
 
 Build the complete cinematic Astro site. Generate all 6 images with Nano Banana Pro (use the GEMINI_API_KEY environment variable), convert each to WebP, wire all GSAP animations, generate all JSON-LD schemas, build all pages, and run `npm run build` to confirm zero errors.
 ```
@@ -240,6 +245,50 @@ Show the user:
 - Primary: `#0A0A14` (Deep Void) / Accent: `#7B61FF` (Plasma) / Background: `#F0EFF4` / Dark: `#18181B`
 - Fonts: Sora + Instrument Serif Italic + Fira Code
 - Image mood: bioluminescence, dark water, neon reflections, microscopy
+
+---
+
+## Step 5: Activate Contact Form Email Notifications
+
+The contact form is built and live, but emails are off until you connect Resend.
+
+### 1. Create a free Resend account
+Go to https://resend.com and sign up. The free tier sends 3,000 emails/month (100/day), plenty for a new business site.
+
+### 2. Get your API key
+Dashboard > API Keys > Create API Key. Copy the key (starts with `re_`).
+
+### 3. Verify your domain
+Dashboard > Domains > Add Domain > enter {domain}.
+Resend will give you DNS records to add (SPF, DKIM, and optionally DMARC).
+Add them in your domain registrar's DNS settings. Verification takes 5-30 minutes.
+This is required so your emails send FROM noreply@{domain}.
+
+### 4. Set the secrets in Cloudflare Pages
+```bash
+wrangler pages secret put RESEND_API_KEY --project-name={brand_slug}-site
+# Paste your re_... key when prompted
+
+wrangler pages secret put CONTACT_EMAIL --project-name={brand_slug}-site
+# Paste {contact_email} when prompted
+```
+
+### 5. Trigger a redeploy
+```bash
+cd {brand_slug}-site
+git commit --allow-empty -m "chore: activate contact form"
+git push
+```
+
+### 6. Test it
+Visit /contact/ on your live site and submit the form. Check {contact_email}: the email arrives from noreply@{domain} with a Reply-To set to the visitor's email so you can reply directly.
+
+**Local dev testing:** Create `.env` in the project root:
+```
+RESEND_API_KEY=re_your_key_here
+CONTACT_EMAIL=your@email.com
+```
+Run `npm run dev` and submit the form.
 
 ---
 
