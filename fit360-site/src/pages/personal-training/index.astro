@@ -1,0 +1,181 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { servicePageSchema } from '../../lib/schema';
+
+const faqs = [
+  {
+    question: 'Do I need to be fit before starting?',
+    answer: 'No. FIT360 personal training starts at your current level, whether you are a complete beginner or returning after injury or illness.',
+  },
+  {
+    question: 'Can you train me if I have a medical condition?',
+    answer: 'Yes. We specialize in PCOD, arthritis, diabetes, slip disc, sciatica, and spondylitis. Your trainer will review your medical background and design a safe, condition-aware program.',
+  },
+  {
+    question: 'How is this different from a regular gym?',
+    answer: 'At FIT360, you train privately with a dedicated coach who knows your full health history. You are never in a crowded gym following a generic plan.',
+  },
+  {
+    question: 'Can I train at home instead of the studio?',
+    answer: 'Yes. We offer the same 1-on-1 coaching for home training with optional equipment delivery.',
+  },
+];
+
+const schema = servicePageSchema(
+  brand,
+  {
+    name: 'Personal Training',
+    slug: 'personal-training',
+    description: '1-on-1 personal training in Kharadi, Pune. FIT360 certified trainers build programs around your health conditions, goals, and schedule.',
+  },
+  faqs,
+);
+
+const title = 'Personal Trainer in Kharadi, Pune | 1-on-1 Coaching | FIT360';
+const description = "1-on-1 personal training in Kharadi, Pune. FIT360's certified trainers build programs around your health conditions, goals, and schedule. Book a free session.";
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <!-- HERO -->
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/training.webp" alt="Personal trainer coaching a client at FIT360 Kharadi studio"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Personal Training</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">KHARADI, PUNE</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Personal Trainer in Kharadi: 1-on-1 Coaching That Delivers Results
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        FIT360 personal training is not a gym membership with a trainer attached. It is a fully customized 1-on-1 coaching relationship built around your health history, your conditions, and your goals. No cookie-cutter workouts.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]/5">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Who This Program Is For</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[
+          'Women with PCOD managing hormonal health',
+          'Adults with back pain, sciatica, or slip disc',
+          'Seniors seeking strength and balance',
+          'Working professionals needing time-efficient plans',
+          'Complete beginners who want structured guidance',
+          'Anyone who prefers private, focused training',
+        ].map((item) => (
+          <div class="flex items-start gap-3 bg-white rounded-2xl p-5 border border-[var(--color-dark)]/8">
+            <Icon name="ph:check-circle-fill" class="size-5 text-[var(--color-accent)] shrink-0 mt-0.5" />
+            <p class="text-sm leading-relaxed">{item}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT MAKES IT DIFFERENT -->
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">What Makes FIT360 Different</h2>
+          <div class="space-y-6">
+            {[
+              { title: '360 Assessment', desc: 'Movement screens, medical background review, and lifestyle analysis before a single exercise is programmed.', icon: 'ph:clipboard-fill' },
+              { title: 'Customized Per Condition', desc: 'Every program accounts for your specific health conditions, injuries, and goals. No two programs are identical.', icon: 'ph:sliders-fill' },
+              { title: 'Nutritionist Integration', desc: 'Your trainer and nutritionist work from the same plan. What you eat supports exactly what you train.', icon: 'ph:bowl-food-fill' },
+              { title: 'Weekly Progress Tracking', desc: 'We track real metrics: body composition, energy, sleep, and condition-specific markers every 4 to 6 weeks.', icon: 'ph:chart-line-up-fill' },
+            ].map((point) => (
+              <div class="flex gap-4">
+                <div class="w-10 h-10 bg-[var(--color-accent)]/10 rounded-xl flex items-center justify-center shrink-0">
+                  <Icon name={point.icon} class="size-5 text-[var(--color-accent)]" />
+                </div>
+                <div>
+                  <h3 class="font-[var(--font-heading)] font-bold mb-1">{point.title}</h3>
+                  <p class="text-[var(--color-muted)] text-sm leading-relaxed">{point.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <img src="/images/training.webp" alt="1-on-1 personal training session at FIT360"
+          class="w-full h-[450px] object-cover rounded-3xl" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-bg)] mb-10">Results You Can Expect</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {[
+          'Improved PCOD symptoms and hormonal balance',
+          'Better blood sugar control and energy for diabetes clients',
+          'Reduced back pain, sciatica, and joint discomfort',
+          'Improved posture, strength, and daily function',
+          'Better sleep quality and mental clarity',
+          'Sustainable body composition changes',
+        ].map((result) => (
+          <div class="flex items-start gap-3">
+            <Icon name="ph:arrow-right-bold" class="size-5 text-[var(--color-accent)] shrink-0 mt-0.5" />
+            <p class="text-[var(--color-bg)]/80 leading-relaxed">{result}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-white border border-[var(--color-dark)]/8 rounded-2xl overflow-hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-[var(--font-heading)] font-semibold">
+              {faq.question}
+              <Icon name="ph:caret-down" class="size-5 text-[var(--color-accent)] group-open:rotate-180 transition-transform" />
+            </summary>
+            <div class="px-6 pb-6 text-[var(--color-muted)] leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">Start with a Free Consultation</h2>
+      <p class="text-white/80 mb-8 text-lg">No commitment. We assess your needs and show you exactly what your program would look like.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact/" class="btn-magnetic bg-white text-[var(--color-accent)] px-8 py-4 rounded-full font-semibold">
+          <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+          <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+        </a>
+        <a href="tel:+917397951908" class="btn-magnetic border border-white text-white px-8 py-4 rounded-full font-semibold">
+          <span class="relative z-10 flex items-center gap-2"><Icon name="ph:phone-call-fill" class="size-5" /> +91 7397951908</span>
+          <span class="btn-bg bg-white/10 rounded-full"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

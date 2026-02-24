@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { medicalBusinessPageSchema } from '../../lib/schema';
+
+const faqs = [
+  {
+    question: 'Is exercise safe with a slip disc?',
+    answer: 'Yes, when programmed correctly. We review your MRI and medical history and design a program that avoids aggravating the disc while building the strength needed for recovery.',
+  },
+  {
+    question: 'Do I need to have had surgery first?',
+    answer: 'No. FIT360 programs are suitable for both conservative (non-surgical) management and post-surgical rehabilitation.',
+  },
+  {
+    question: 'How long will recovery take?',
+    answer: 'Most clients see significant pain reduction within 6 to 12 weeks. Full functional recovery depends on the severity of the disc issue and consistency of the program.',
+  },
+  {
+    question: 'Can I train from home?',
+    answer: 'Yes. Spine rehabilitation programs are available as home training with video guides, equipment delivery, and weekly coaching check-ins.',
+  },
+];
+
+const schema = medicalBusinessPageSchema(
+  brand,
+  {
+    name: 'Slip Disc and Back Pain Management',
+    slug: 'slip-disc-back-pain',
+    description: "FIT360's slip disc and back pain program in Pune uses spine-safe exercises to reduce pain, improve posture, and prevent re-injury.",
+  },
+  faqs,
+);
+
+const title = 'Slip Disc and Back Pain Management in Pune | FIT360';
+const description = "FIT360's slip disc and back pain program in Pune uses spine-safe exercises to reduce pain, improve posture, and prevent re-injury. Expert personal trainers.";
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/conditions.webp" alt="Back pain and slip disc exercise program at FIT360 Pune"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Slip Disc and Back Pain</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">SPINAL REHABILITATION</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Slip Disc and Back Pain Management in Pune: Safe, Structured Rehabilitation
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        A slip disc (herniated disc) can cause debilitating back pain, leg pain, and restricted movement. FIT360's spine rehabilitation program uses evidence-based exercise protocols to reduce pressure on the disc, strengthen the surrounding muscles, and restore normal movement safely.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">What is a Slip Disc?</h2>
+          <p class="text-[var(--color-muted)] leading-relaxed mb-6">
+            A herniated or bulging disc occurs when the soft inner core of a spinal disc pushes through the outer layer and presses on nearby nerves. This causes pain, numbness, and weakness in the back, legs, or arms depending on the location.
+          </p>
+          <p class="text-[var(--color-muted)] leading-relaxed">
+            The lumbar (lower back) region is most commonly affected, causing symptoms like lower back pain, radiating leg pain, muscle weakness, and difficulty standing or walking for extended periods.
+          </p>
+        </div>
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">How Exercise Helps</h2>
+          <div class="space-y-5">
+            {[
+              { title: 'Decompresses the Spine', desc: 'Specific movements and positions reduce the disc pressure that causes pain and nerve irritation.', icon: 'ph:arrows-out-fill' },
+              { title: 'Builds Core Support', desc: 'Strong core and back muscles take load off the disc, allowing it to heal and preventing re-injury.', icon: 'ph:circle-fill' },
+              { title: 'Restores Posture and Alignment', desc: 'Corrective exercise addresses the postural habits that created or worsened the disc problem.', icon: 'ph:person-fill' },
+              { title: 'Reduces Nerve Irritation', desc: 'Neural mobilization techniques reduce nerve sensitivity and improve pain-free range of motion.', icon: 'ph:lightning-fill' },
+            ].map((point) => (
+              <div class="flex gap-4">
+                <div class="w-10 h-10 bg-[var(--color-accent)]/10 rounded-xl flex items-center justify-center shrink-0">
+                  <Icon name={point.icon} class="size-5 text-[var(--color-accent)]" />
+                </div>
+                <div>
+                  <h3 class="font-[var(--font-heading)] font-bold mb-1">{point.title}</h3>
+                  <p class="text-[var(--color-muted)] text-sm leading-relaxed">{point.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-white border border-[var(--color-dark)]/8 rounded-2xl overflow-hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-[var(--font-heading)] font-semibold">
+              {faq.question}
+              <Icon name="ph:caret-down" class="size-5 text-[var(--color-accent)] group-open:rotate-180 transition-transform" />
+            </summary>
+            <div class="px-6 pb-6 text-[var(--color-muted)] leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">Start Your Back Pain Recovery</h2>
+      <p class="text-white/80 mb-8 text-lg">Book a free consultation. We'll review your condition and design a safe rehabilitation program.</p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-white text-[var(--color-accent)] px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

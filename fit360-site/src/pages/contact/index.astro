@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { contactPageSchema } from '../../lib/schema';
+
+const schema = contactPageSchema(brand);
+const title = 'Contact FIT360 | Book a Free Consultation in Kharadi, Pune';
+const description = 'Contact FIT360 in Kharadi, Pune. Book your free fitness consultation. Call +91 7397951908 or email fit360kharadi@gmail.com. Open Mon-Sat, 6 AM to 8 PM.';
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="pt-32 pb-16 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Contact</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">KHARADI, PUNE</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Book Your Free Consultation at FIT360
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-4">
+        Tell us about your health goals and conditions. We'll review your situation and recommend the right program.
+      </p>
+      <p class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] mb-16">
+        Your first consultation is free. No commitment required.
+      </p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-16">
+        <!-- FORM -->
+        <div class="lg:col-span-3">
+          <form id="contact-form" class="space-y-6">
+            <div>
+              <label for="name" class="block text-sm font-semibold mb-2">Name</label>
+              <input id="name" name="name" type="text" required placeholder="Your full name"
+                class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-shadow" />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-semibold mb-2">Email</label>
+              <input id="email" name="email" type="email" required placeholder="your@email.com"
+                class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-shadow" />
+            </div>
+            <div>
+              <label for="phone" class="block text-sm font-semibold mb-2">Phone <span class="font-normal opacity-50">(optional)</span></label>
+              <input id="phone" name="phone" type="tel" placeholder="+91 XXXXX XXXXX"
+                class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-shadow" />
+            </div>
+            <div>
+              <label for="interest" class="block text-sm font-semibold mb-2">What are you looking for?</label>
+              <select id="interest" name="interest"
+                class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-shadow">
+                <option value="">Select a program or condition</option>
+                <option value="Personal Training">Personal Training</option>
+                <option value="Nutrition Coaching">Nutrition Coaching</option>
+                <option value="PCOD Program">PCOD Program</option>
+                <option value="Diabetes Program">Diabetes Program</option>
+                <option value="Arthritis Relief">Arthritis Relief</option>
+                <option value="Sciatica Relief">Sciatica Relief</option>
+                <option value="Back Pain / Slip Disc">Back Pain / Slip Disc</option>
+                <option value="Spondylitis">Spondylitis</option>
+                <option value="Home Training">Home Training</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="message" class="block text-sm font-semibold mb-2">Message</label>
+              <textarea id="message" name="message" rows="5" required placeholder="Tell us about your health goals, current conditions, or any questions you have..."
+                class="w-full px-4 py-3 rounded-xl border border-[var(--color-dark)]/15 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-shadow resize-none"></textarea>
+            </div>
+            <!-- Honeypot -->
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button type="submit"
+              class="btn-magnetic w-full bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold text-lg">
+              <span class="relative z-10">Book a Free Consultation</span>
+              <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+            </button>
+            <p id="form-status" class="hidden text-center text-sm font-medium"></p>
+          </form>
+        </div>
+
+        <!-- CONTACT DETAILS -->
+        <div class="lg:col-span-2">
+          <div class="space-y-8">
+            <div>
+              <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">STUDIO</p>
+              <div class="space-y-5">
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon name="ph:map-pin-fill" class="size-5 text-[var(--color-primary)]" />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-sm mb-1">Address</p>
+                    <p class="text-[var(--color-muted)] text-sm">Grant Rd, EON Free Zone, Kharadi, Pune, Maharashtra 411014</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon name="ph:clock-fill" class="size-5 text-[var(--color-primary)]" />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-sm mb-1">Studio Hours</p>
+                    <p class="text-[var(--color-muted)] text-sm">Monday to Saturday</p>
+                    <p class="text-[var(--color-muted)] text-sm">6:00 AM to 8:00 PM</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon name="ph:phone-call-fill" class="size-5 text-[var(--color-primary)]" />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-sm mb-1">Phone</p>
+                    <a href="tel:+917397951908" class="text-[var(--color-accent)] text-sm hover:underline">+91 7397951908</a>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon name="ph:envelope-fill" class="size-5 text-[var(--color-primary)]" />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-sm mb-1">Email</p>
+                    <a href="mailto:fit360kharadi@gmail.com" class="text-[var(--color-accent)] text-sm hover:underline">fit360kharadi@gmail.com</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-[var(--color-primary)] rounded-3xl p-8">
+              <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">RATING</p>
+              <div class="flex items-center gap-3 mb-3">
+                <div class="flex">
+                  <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+                  <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+                  <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+                  <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+                  <Icon name="ph:star-half-fill" class="size-5 text-yellow-400" />
+                </div>
+                <span class="text-[var(--color-bg)] font-bold">4.6 / 5</span>
+              </div>
+              <p class="text-[var(--color-bg)]/60 text-sm">14 reviews on Google</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const status = document.getElementById('form-status');
+  const submitBtn = form?.querySelector('button[type="submit"]') as HTMLButtonElement;
+  const submitLabel = submitBtn?.querySelector('span.relative') as HTMLElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!submitBtn || !status || !submitLabel) return;
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = 'Sending...';
+    status.classList.add('hidden');
+
+    const formData = new FormData(form);
+    const data: Record<string, string> = {};
+    formData.forEach((value, key) => { data[key] = value.toString(); });
+
+    try {
+      const res = await fetch('/api/contact/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || json.error) {
+        status.textContent = json.error || 'Something went wrong. Please try again.';
+        status.style.color = 'var(--color-accent)';
+        status.classList.remove('hidden');
+      } else {
+        status.textContent = 'Message sent! We will be in touch within 24 hours.';
+        status.style.color = 'var(--color-primary)';
+        status.classList.remove('hidden');
+        form.reset();
+      }
+    } catch {
+      status.textContent = 'Network error. Please check your connection and try again.';
+      status.style.color = 'var(--color-accent)';
+      status.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'Book a Free Consultation';
+    }
+  });
+</script>

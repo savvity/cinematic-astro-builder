@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/sections/Navbar.astro';
+import Footer from '../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../data/brand';
+---
+<BaseLayout
+  title={`Page Not Found | ${brand.name}`}
+  description="The page you're looking for doesn't exist or may have moved."
+  noindex={true}
+>
+  <Navbar />
+  <main class="min-h-[70vh] flex items-center justify-center px-8 py-32">
+    <div class="text-center max-w-lg">
+      <p class="font-[var(--font-mono)] text-[var(--color-accent)] text-sm tracking-widest mb-4">404</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,4.5rem)] leading-tight mb-6">
+        Page not found.
+      </h1>
+      <p class="opacity-60 mb-10 text-lg">
+        The page you're looking for doesn't exist or may have moved.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold text-lg">
+          <span class="relative z-10 flex items-center gap-2">
+            Back to home <Icon name="ph:arrow-right-bold" class="size-5" />
+          </span>
+          <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+        </a>
+        <a href="/contact/" class="btn-magnetic inline-flex bg-transparent border border-[var(--color-dark)]/20 text-[var(--color-dark)] px-8 py-4 rounded-full font-semibold text-lg">
+          <span class="relative z-10">Contact us</span>
+          <span class="btn-bg bg-[var(--color-dark)]/5 rounded-full"></span>
+        </a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

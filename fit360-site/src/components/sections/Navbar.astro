@@ -1,0 +1,125 @@
+---
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+---
+<header>
+  <nav id="site-nav" data-transparent
+    class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6
+           px-6 py-3 rounded-full border transition-all duration-300 w-max max-w-[95vw]">
+    <!-- Logo -->
+    <a href="/" class="font-[var(--font-heading)] font-bold text-lg tracking-tight link-lift text-[var(--color-primary)]">
+      {brand.name}
+    </a>
+    <!-- Desktop nav -->
+    <ul class="hidden lg:flex items-center gap-1 text-sm font-medium">
+      <li class="nav-dropdown-trigger relative">
+        <button class="link-lift px-3 py-2 flex items-center gap-1 transition-opacity">
+          Programs <Icon name="ph:caret-down" class="size-3" />
+        </button>
+        <div class="nav-dropdown absolute top-full left-0 bg-[var(--color-bg)] border border-[var(--color-dark)]/10 rounded-2xl shadow-xl p-3 min-w-[220px]">
+          <a href="/personal-training/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Personal Training</a>
+          <a href="/nutrition-coaching/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Nutrition Coaching</a>
+          <a href="/exercise-specialist/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Exercise Specialist</a>
+          <a href="/private-studio/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Private Studio</a>
+          <a href="/home-training/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Home Training</a>
+        </div>
+      </li>
+      <li class="nav-dropdown-trigger relative">
+        <button class="link-lift px-3 py-2 flex items-center gap-1 transition-opacity">
+          Conditions <Icon name="ph:caret-down" class="size-3" />
+        </button>
+        <div class="nav-dropdown absolute top-full left-0 bg-[var(--color-bg)] border border-[var(--color-dark)]/10 rounded-2xl shadow-xl p-3 min-w-[240px]">
+          <a href="/pcod-reversal/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">PCOD Reversal</a>
+          <a href="/diabetes-reversal/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Diabetes Management</a>
+          <a href="/arthritis-relief/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Arthritis Relief</a>
+          <a href="/sciatica-pain-relief/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Sciatica Relief</a>
+          <a href="/slip-disc-back-pain/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Back Pain / Slip Disc</a>
+          <a href="/spondylitis-management/" class="block px-4 py-2.5 text-sm hover:bg-[var(--color-primary)]/5 rounded-xl transition-colors">Spondylitis Management</a>
+        </div>
+      </li>
+      <li><a href="/about/" class="link-lift px-3 py-2 transition-opacity">About</a></li>
+      <li><a href="/blog/" class="link-lift px-3 py-2 transition-opacity">Blog</a></li>
+    </ul>
+    <!-- CTA -->
+    <a href="/contact/" class="btn-magnetic hidden lg:flex bg-[var(--color-accent)] text-white
+       px-5 py-2 rounded-full text-sm font-semibold">
+      <span class="relative z-10">Free Consultation</span>
+      <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+    </a>
+    <!-- Mobile hamburger -->
+    <button id="nav-toggle" class="lg:hidden ml-auto" aria-label="Toggle menu">
+      <Icon name="ph:list" class="size-6" />
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden fixed inset-0 z-40 glass flex flex-col items-center justify-center gap-6 overflow-y-auto py-20">
+    <button id="nav-close" class="absolute top-6 right-6">
+      <Icon name="ph:x" class="size-6" />
+    </button>
+    <div class="text-center">
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">PROGRAMS</p>
+      <div class="flex flex-col gap-3">
+        <a href="/personal-training/" class="text-xl font-semibold">Personal Training</a>
+        <a href="/nutrition-coaching/" class="text-xl font-semibold">Nutrition Coaching</a>
+        <a href="/exercise-specialist/" class="text-xl font-semibold">Exercise Specialist</a>
+        <a href="/private-studio/" class="text-xl font-semibold">Private Studio</a>
+        <a href="/home-training/" class="text-xl font-semibold">Home Training</a>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">CONDITIONS</p>
+      <div class="flex flex-col gap-3">
+        <a href="/pcod-reversal/" class="text-xl font-semibold">PCOD Reversal</a>
+        <a href="/diabetes-reversal/" class="text-xl font-semibold">Diabetes Management</a>
+        <a href="/arthritis-relief/" class="text-xl font-semibold">Arthritis Relief</a>
+        <a href="/sciatica-pain-relief/" class="text-xl font-semibold">Sciatica Relief</a>
+        <a href="/slip-disc-back-pain/" class="text-xl font-semibold">Back Pain / Slip Disc</a>
+        <a href="/spondylitis-management/" class="text-xl font-semibold">Spondylitis Management</a>
+      </div>
+    </div>
+    <div class="flex flex-col items-center gap-3 mt-4">
+      <a href="/about/" class="text-xl font-semibold">About</a>
+      <a href="/blog/" class="text-xl font-semibold">Blog</a>
+    </div>
+    <a href="/contact/" class="btn-magnetic bg-[var(--color-accent)] text-white px-8 py-3 rounded-full text-lg font-semibold mt-4">
+      <span class="relative z-10">Book Free Consultation</span>
+      <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+    </a>
+  </div>
+</header>
+
+<script>
+  const nav = document.getElementById('site-nav');
+  const hero = document.querySelector('[data-hero]');
+  if (nav && hero) {
+    new IntersectionObserver(
+      ([e]) => nav.toggleAttribute('data-transparent', e.isIntersecting),
+      { threshold: 0.1 }
+    ).observe(hero);
+  } else if (nav) {
+    // No hero on this page — always show the frosted glass background
+    nav.removeAttribute('data-transparent');
+  }
+
+  const toggle = document.getElementById('nav-toggle');
+  const close = document.getElementById('nav-close');
+  const menu = document.getElementById('mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    menu?.classList.remove('hidden');
+    menu?.classList.add('flex');
+  });
+  close?.addEventListener('click', () => {
+    menu?.classList.add('hidden');
+    menu?.classList.remove('flex');
+  });
+
+  // Close mobile menu on any link click
+  menu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      menu.classList.add('hidden');
+      menu.classList.remove('flex');
+    });
+  });
+</script>

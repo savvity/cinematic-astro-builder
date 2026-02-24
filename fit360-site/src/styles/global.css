@@ -1,0 +1,221 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Preset A — Organic Tech */
+  --color-primary: #2E4036;
+  --color-accent:  #CC5833;
+  --color-bg:      #F2F0E9;
+  --color-dark:    #1A1A1A;
+  --color-text:    #2A2A2A;
+  --color-muted:   #6B7280;
+
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-drama:   'Cormorant Garamond', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  --section-y: 7rem;
+}
+
+/* ---- NOISE OVERLAY ---- */
+@layer components {
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ---- MAGNETIC BUTTON ---- */
+  .btn-magnetic {
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-magnetic:hover { transform: scale(1.03); }
+  .btn-magnetic .btn-bg {
+    position: absolute;
+    inset: 0;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .btn-magnetic:hover .btn-bg { transform: translateY(0); }
+
+  /* ---- CARD HOVER ---- */
+  .card-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px color-mix(in srgb, var(--color-accent) 18%, transparent);
+    background-color: color-mix(in srgb, var(--color-accent) 5%, white);
+  }
+
+  /* Inner-page white cards only — scoped to bg-white so dark-section cards are never touched */
+  section .grid > .rounded-3xl.bg-white,
+  section .grid > .rounded-2xl.bg-white {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  section .grid > .rounded-3xl.bg-white:hover,
+  section .grid > .rounded-2xl.bg-white:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px color-mix(in srgb, var(--color-accent) 18%, transparent);
+    background-color: color-mix(in srgb, var(--color-accent) 5%, white);
+  }
+
+  /* ---- LINK LIFT ---- */
+  .link-lift { transition: transform 0.2s ease; }
+  .link-lift:hover { transform: translateY(-1px); }
+
+  /* ---- NAVBAR TRANSPARENCY STATES ---- */
+  nav[data-transparent] {
+    background: transparent;
+    border-color: transparent;
+  }
+  nav:not([data-transparent]) {
+    background: color-mix(in srgb, var(--color-bg) 60%, transparent);
+    backdrop-filter: blur(24px);
+    border-color: color-mix(in srgb, var(--color-dark) 10%, transparent);
+  }
+
+  /* When nav is over hero: top-level logo + buttons turn white */
+  nav[data-transparent] > a:not(.btn-magnetic) {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  nav[data-transparent] > ul > li > button,
+  nav[data-transparent] > ul > li > a:not(.btn-magnetic) {
+    color: rgba(255, 255, 255, 0.85) !important;
+    opacity: 1 !important;
+  }
+  nav[data-transparent] > ul > li > button:hover,
+  nav[data-transparent] > ul > li > a:not(.btn-magnetic):hover {
+    color: rgba(255, 255, 255, 1) !important;
+  }
+  /* Dropdown items always stay dark — they appear over the light dropdown panel */
+  nav[data-transparent] .nav-dropdown a {
+    color: var(--color-dark) !important;
+    opacity: 1 !important;
+  }
+  nav[data-transparent] .nav-dropdown a:hover {
+    color: var(--color-primary) !important;
+  }
+
+  /* ---- GLASS MORPHISM ---- */
+  .glass {
+    background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+    backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--color-dark) 8%, transparent);
+  }
+
+  /* ---- DROPDOWN ---- */
+  .nav-dropdown {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    /* Remove mt-2 gap so dropdown sits flush under the trigger for reliable hover */
+    margin-top: 0;
+    padding-top: 8px; /* visual spacing without a gap */
+  }
+  /* Transparent bridge above the dropdown panel to prevent hover gap */
+  .nav-dropdown::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 10px;
+  }
+  .nav-dropdown-trigger:hover .nav-dropdown,
+  .nav-dropdown-trigger:focus-within .nav-dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+
+  /* ---- DISPLAY CARDS (stacked skew) ---- */
+  .display-card {
+    position: relative;
+    display: flex;
+    height: 9rem;
+    width: 22rem;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 0.75rem;
+    border: 2px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    background-color: var(--color-primary);
+    padding: 0.75rem 1rem;
+    transform: skewY(-8deg);
+    user-select: none;
+    /* Right-edge fade to blend into background */
+    overflow: visible;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .display-card::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -5%;
+    height: 110%;
+    width: 18rem;
+    background: linear-gradient(to left, var(--color-bg), transparent);
+    pointer-events: none;
+  }
+  /* Hover: subtle glow + border highlight — no transform fight */
+  .display-card:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 20%, transparent),
+                0 8px 32px -4px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+
+/* ---- ANIMATION UTILITIES ---- */
+@utility fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+}
+@utility fade-in {
+  opacity: 0;
+}
+@utility stagger-1 { animation-delay: 0.08s; }
+@utility stagger-2 { animation-delay: 0.16s; }
+@utility stagger-3 { animation-delay: 0.24s; }
+
+/* ---- SCROLL REVEAL SYSTEM ---- */
+
+/* Hero entrance — plays immediately on page load */
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.anim-hero {
+  opacity: 0;
+  animation: heroSlideUp 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Scroll-triggered fade-up (cards, headings, list items) */
+.anim-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity   0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scroll-triggered pure fade (images, panels) */
+.anim-fade {
+  opacity: 0;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-fade.is-visible { opacity: 1; }

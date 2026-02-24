@@ -1,0 +1,91 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { blogPostSchema } from '../../lib/schema';
+import { getCollection } from 'astro:content';
+import { render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const schema = blogPostSchema(brand, {
+  title: post.data.title,
+  slug: post.data.slug,
+  description: post.data.description,
+  publishDate: post.data.publishDate,
+  author: post.data.author,
+});
+
+const title = `${post.data.title} | FIT360 Blog`;
+---
+<BaseLayout title={title} description={post.data.description} {schema}>
+  <Navbar />
+
+  <article class="pt-32 pb-24 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-8" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <a href="/blog/" class="hover:text-[var(--color-accent)] transition-colors">Blog</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)] truncate max-w-[200px]">{post.data.title}</span>
+      </nav>
+
+      <div class="flex items-center gap-3 mb-6">
+        <span class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] bg-[var(--color-accent)]/10 px-3 py-1 rounded-full">
+          {post.data.category}
+        </span>
+        <span class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">
+          {post.data.publishDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </span>
+        <span class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">By {post.data.author}</span>
+      </div>
+
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-primary)] leading-tight mb-8">
+        {post.data.title}
+      </h1>
+
+      <p class="text-xl text-[var(--color-muted)] leading-relaxed mb-12 font-[var(--font-heading)]">
+        {post.data.description}
+      </p>
+
+      <div class="prose prose-lg max-w-none
+        prose-headings:font-[var(--font-heading)] prose-headings:font-bold prose-headings:text-[var(--color-primary)]
+        prose-h2:text-2xl prose-h3:text-xl
+        prose-p:text-[var(--color-muted)] prose-p:leading-relaxed
+        prose-strong:text-[var(--color-dark)] prose-strong:font-semibold
+        prose-a:text-[var(--color-accent)] prose-a:no-underline hover:prose-a:underline
+        prose-li:text-[var(--color-muted)]
+        prose-ul:list-disc prose-ul:pl-5">
+        <Content />
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-[var(--color-dark)]/10">
+        <div class="bg-[var(--color-primary)]/5 rounded-3xl p-8">
+          <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">READY TO START?</p>
+          <h2 class="font-[var(--font-heading)] font-bold text-xl mb-3">Book a Free Consultation at FIT360</h2>
+          <p class="text-[var(--color-muted)] mb-6">Our team of trainers, nutritionists, and exercise specialists in Kharadi will design a program for your specific health needs.</p>
+          <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+            <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+            <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <Footer />
+</BaseLayout>

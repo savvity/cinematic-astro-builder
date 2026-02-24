@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { medicalBusinessPageSchema } from '../../lib/schema';
+
+const faqs = [
+  {
+    question: 'Is this safe if I am on diabetes medication?',
+    answer: 'Yes. We review your medication and health history before designing your program. We work alongside your doctor, not instead of them.',
+  },
+  {
+    question: 'How quickly will I see results?',
+    answer: 'Many clients see improved energy and blood sugar readings within 4 to 6 weeks. Full results depend on consistency and your starting point.',
+  },
+  {
+    question: 'Do I need to change my diet completely?',
+    answer: 'No. We make gradual, sustainable changes to meal timing and food choices. No extreme diets.',
+  },
+  {
+    question: 'Can I do this at home?',
+    answer: 'Yes. Full home training programs are available with equipment delivery and weekly coach check-ins.',
+  },
+];
+
+const schema = medicalBusinessPageSchema(
+  brand,
+  {
+    name: 'Diabetes Management Program',
+    slug: 'diabetes-reversal',
+    description: 'FIT360 helps Type 2 diabetes clients in Pune reduce medication dependence through structured exercise and nutrition. Improve insulin sensitivity naturally.',
+  },
+  faqs,
+);
+
+const title = 'Diabetes Management Program Pune | FIT360';
+const description = 'FIT360 helps Type 2 diabetes clients in Pune reduce medication dependence through structured exercise and nutrition. Improve insulin sensitivity naturally.';
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/conditions.webp" alt="Diabetes management exercise program at FIT360 Pune"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Diabetes Management</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">CONDITION-SPECIFIC PROGRAM</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Type 2 Diabetes Management Through Exercise in Pune
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        FIT360's diabetes management program uses evidence-based exercise and nutrition protocols to help Type 2 diabetes and pre-diabetes clients in Pune improve blood sugar control, reduce medication dependence, and restore energy naturally.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">How Exercise Helps Type 2 Diabetes</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { title: 'Increases Insulin Sensitivity', desc: 'Exercise makes your muscles more efficient at absorbing glucose, reducing blood sugar levels without medication.', icon: 'ph:drop-fill' },
+          { title: 'Lowers Fasting Blood Sugar', desc: 'Regular aerobic and strength training reduces baseline blood glucose and HbA1c over time.', icon: 'ph:chart-line-up-fill' },
+          { title: 'Improves Glucose Uptake', desc: 'Muscle contractions during exercise allow glucose to enter cells even without insulin, providing immediate blood sugar control.', icon: 'ph:lightning-fill' },
+          { title: 'Reduces Belly Fat', desc: 'Targeted programming reduces visceral fat, the primary driver of insulin resistance in Type 2 diabetes.', icon: 'ph:fire-fill' },
+          { title: 'Boosts Energy and Mood', desc: 'Improved metabolic health leads to significantly better energy levels, mental clarity, and reduced fatigue.', icon: 'ph:sun-fill' },
+          { title: 'Improves Sleep Quality', desc: 'Regular exercise improves sleep, which directly impacts blood sugar regulation and insulin function.', icon: 'ph:moon-fill' },
+        ].map((point) => (
+          <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-6">
+            <div class="w-10 h-10 bg-[var(--color-accent)]/10 rounded-xl flex items-center justify-center mb-4">
+              <Icon name={point.icon} class="size-5 text-[var(--color-accent)]" />
+            </div>
+            <h3 class="font-[var(--font-heading)] font-bold mb-2">{point.title}</h3>
+            <p class="text-[var(--color-muted)] text-sm leading-relaxed">{point.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-bg)] mb-12">Your 3-Step Program</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { step: '01', title: 'Health and Lifestyle Assessment', desc: 'We review your glucose levels, energy patterns, stress, diet, current activity, and any medication you are taking before designing anything.' },
+          { step: '02', title: 'Personalized Aerobic and Strength Training', desc: 'Your program mixes cardio and resistance exercises in the right combination to maximize insulin sensitivity and blood sugar control.' },
+          { step: '03', title: 'Weekly Monitoring and Adjustments', desc: 'We track your energy, blood sugar readings, and progress weekly. Your program evolves as your metabolic health improves.' },
+        ].map((step) => (
+          <div class="border border-[var(--color-bg)]/20 rounded-3xl p-8">
+            <p class="font-[var(--font-mono)] text-2xl text-[var(--color-accent)] mb-4">{step.step}</p>
+            <h3 class="font-[var(--font-heading)] font-bold text-[var(--color-bg)] text-lg mb-3">{step.title}</h3>
+            <p class="text-[var(--color-bg)]/60 text-sm leading-relaxed">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]/5">
+    <div class="max-w-3xl mx-auto">
+      <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-10">
+        <div class="flex mb-4">
+          <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-5 text-yellow-400" />
+        </div>
+        <Icon name="ph:quotes-fill" class="size-10 text-[var(--color-accent)]/30 mb-6" />
+        <p class="font-[var(--font-drama)] italic text-2xl text-[var(--color-primary)] leading-relaxed mb-8">
+          I had been on diabetes medication for 5 years with no real change. After working with FIT360, my energy shot up, I lost 7kg, and my doctor said I could start tapering off medication.
+        </p>
+        <div>
+          <p class="font-[var(--font-heading)] font-bold">Diabetes Client</p>
+          <p class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">Pune — Diabetes Management Program</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-white border border-[var(--color-dark)]/8 rounded-2xl overflow-hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-[var(--font-heading)] font-semibold">
+              {faq.question}
+              <Icon name="ph:caret-down" class="size-5 text-[var(--color-accent)] group-open:rotate-180 transition-transform" />
+            </summary>
+            <div class="px-6 pb-6 text-[var(--color-muted)] leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">Book Your Free Diabetes Consultation</h2>
+      <p class="text-white/80 mb-8 text-lg">We'll review your health history and show you what a diabetes management program looks like.</p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-white text-[var(--color-accent)] px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

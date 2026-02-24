@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { blogIndexSchema } from '../../lib/schema';
+import { getCollection } from 'astro:content';
+import { render } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+
+const schema = blogIndexSchema(brand);
+const title = 'FIT360 Blog | Fitness, Nutrition, and Health Advice for Pune';
+const description = "Expert fitness and health articles from FIT360's trainers and nutritionists in Kharadi, Pune. Science-backed advice on PCOD, diabetes, back pain, and more.";
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="pt-32 pb-16 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Blog</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">EXPERT INSIGHTS</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        FIT360 Blog: Expert Health and Fitness Advice
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed">
+        Science-backed fitness, nutrition, and health articles from FIT360's team of trainers, nutritionists, and exercise specialists in Kharadi, Pune.
+      </p>
+    </div>
+  </section>
+
+  <section class="pb-24 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {sortedPosts.map((post) => (
+          <a href={`/blog/${post.data.slug}/`} class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl overflow-hidden">
+            <div class="bg-[var(--color-primary)]/5 h-40 flex items-center justify-center p-8">
+              <Icon name="ph:article-fill" class="size-16 text-[var(--color-primary)]/30" />
+            </div>
+            <div class="p-8">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] bg-[var(--color-accent)]/10 px-3 py-1 rounded-full">
+                  {post.data.category}
+                </span>
+                <span class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">
+                  {post.data.publishDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              <h2 class="font-[var(--font-heading)] font-bold text-lg mb-3 group-hover:text-[var(--color-accent)] transition-colors">{post.data.title}</h2>
+              <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-5">{post.data.description}</p>
+              <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">
+                Read article <Icon name="ph:arrow-right-bold" class="size-4" />
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-[var(--color-bg)] mb-4">Ready to Start Your Health Journey?</h2>
+      <p class="text-[var(--color-bg)]/70 mb-8 text-lg">Book a free consultation with FIT360. We'll assess your needs and design a program that works.</p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-bg)]/20 rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

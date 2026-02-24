@@ -1,0 +1,94 @@
+---
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+---
+<footer class="bg-[var(--color-primary)] rounded-t-[4rem] text-[var(--color-bg)] pt-20 pb-10 px-8 mt-20">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+      <!-- Brand -->
+      <div class="md:col-span-1">
+        <p class="font-[var(--font-heading)] font-bold text-2xl mb-3">{brand.name}</p>
+        <p class="text-[var(--color-bg)]/60 text-sm leading-relaxed mb-6">
+          Kharadi's multidisciplinary fitness studio. Science-backed programs for real health challenges.
+        </p>
+        <!-- System status -->
+        <div class="flex items-center gap-2">
+          <span class="relative flex size-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+          </span>
+          <span class="font-[var(--font-mono)] text-xs text-green-400">Studio Open Mon-Sat</span>
+        </div>
+      </div>
+
+      <!-- Programs -->
+      <div>
+        <p class="font-[var(--font-mono)] text-xs text-[var(--color-bg)]/40 tracking-widest mb-4">PROGRAMS</p>
+        <ul class="space-y-2.5">
+          <li><a href="/personal-training/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Personal Training</a></li>
+          <li><a href="/nutrition-coaching/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Nutrition Coaching</a></li>
+          <li><a href="/exercise-specialist/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Exercise Specialist</a></li>
+          <li><a href="/private-studio/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Private Studio</a></li>
+          <li><a href="/home-training/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Home Training</a></li>
+        </ul>
+      </div>
+
+      <!-- Conditions -->
+      <div>
+        <p class="font-[var(--font-mono)] text-xs text-[var(--color-bg)]/40 tracking-widest mb-4">CONDITIONS</p>
+        <ul class="space-y-2.5">
+          <li><a href="/pcod-reversal/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">PCOD Reversal</a></li>
+          <li><a href="/diabetes-reversal/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Diabetes Management</a></li>
+          <li><a href="/arthritis-relief/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Arthritis Relief</a></li>
+          <li><a href="/sciatica-pain-relief/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Sciatica Relief</a></li>
+          <li><a href="/slip-disc-back-pain/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Back Pain / Slip Disc</a></li>
+          <li><a href="/spondylitis-management/" class="text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">Spondylitis</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <p class="font-[var(--font-mono)] text-xs text-[var(--color-bg)]/40 tracking-widest mb-4">CONTACT</p>
+        <ul class="space-y-3">
+          <li class="flex items-start gap-2 text-sm text-[var(--color-bg)]/70">
+            <Icon name="ph:map-pin-fill" class="size-4 mt-0.5 shrink-0 text-[var(--color-accent)]" />
+            Grant Rd, EON Free Zone, Kharadi, Pune 411014
+          </li>
+          <li>
+            <a href="tel:+917397951908" class="flex items-center gap-2 text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">
+              <Icon name="ph:phone-call-fill" class="size-4 shrink-0 text-[var(--color-accent)]" />
+              +91 7397951908
+            </a>
+          </li>
+          <li>
+            <a href="mailto:fit360kharadi@gmail.com" class="flex items-center gap-2 text-sm text-[var(--color-bg)]/70 hover:text-[var(--color-bg)] transition-colors">
+              <Icon name="ph:envelope-fill" class="size-4 shrink-0 text-[var(--color-accent)]" />
+              fit360kharadi@gmail.com
+            </a>
+          </li>
+          <li class="flex items-center gap-2 text-sm text-[var(--color-bg)]/70">
+            <Icon name="ph:clock-fill" class="size-4 shrink-0 text-[var(--color-accent)]" />
+            Mon-Sat, 6:00 AM to 8:00 PM
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-[var(--color-bg)]/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-sm text-[var(--color-bg)]/50">
+        <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+        <span>4.6/5 on Google</span>
+        <span class="opacity-40">14 reviews</span>
+      </div>
+      <p class="text-sm text-[var(--color-bg)]/40 text-center">
+        &copy; 2025 FIT360. All rights reserved.
+      </p>
+      <div class="flex items-center gap-4 text-sm text-[var(--color-bg)]/50">
+        <a href="/about/" class="hover:text-[var(--color-bg)] transition-colors">About</a>
+        <a href="/blog/" class="hover:text-[var(--color-bg)] transition-colors">Blog</a>
+        <a href="/contact/" class="hover:text-[var(--color-bg)] transition-colors">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>

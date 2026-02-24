@@ -1,0 +1,461 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/sections/Navbar.astro';
+import Footer from '../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../data/brand';
+import { homePageSchema } from '../lib/schema';
+
+const schema = homePageSchema(brand, '/images/hero.webp');
+const title = 'FIT360 | Personal Training Studio in Kharadi, Pune';
+const description =
+  "FIT360 is Kharadi's science-backed personal training studio. Expert programs for PCOD, diabetes, back pain and weight management. Book your free consultation today.";
+---
+<BaseLayout {title} {description} schema={schema}>
+  <Navbar />
+
+  <!-- HERO -->
+  <section data-hero class="relative h-[100dvh] flex items-end overflow-hidden">
+    <img
+      src="/images/hero.webp"
+      alt="FIT360 private fitness studio in Kharadi Pune with modern equipment and moss-green walls"
+      class="absolute inset-0 w-full h-full object-cover"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/95 via-[var(--color-primary)]/50 to-transparent"></div>
+    <div class="relative z-10 px-8 md:px-16 pb-16 md:pb-24 max-w-5xl w-full">
+      <p data-hero-text class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] tracking-widest mb-4">
+        KHARADI, PUNE
+      </p>
+      <h1 data-hero-text class="font-[var(--font-drama)] italic text-[clamp(3rem,8vw,7rem)] leading-none text-[var(--color-bg)] mb-6">
+        Science-Backed Personal Training in Kharadi, Pune
+      </h1>
+      <p data-hero-text class="font-[var(--font-heading)] text-lg md:text-xl text-[var(--color-bg)]/80 mb-8 max-w-2xl leading-relaxed">
+        FIT360 combines certified personal trainers, licensed nutritionists, and exercise specialists to create programs that actually work for your health conditions and life goals.
+      </p>
+      <div data-hero-text class="flex flex-wrap gap-4 mb-8">
+        <a href="/contact/" class="btn-magnetic bg-[var(--color-accent)] text-white px-8 py-4 rounded-full text-base font-semibold">
+          <span class="relative z-10 flex items-center gap-2">
+            Book a Free Consultation
+            <Icon name="ph:arrow-right-bold" class="size-5" />
+          </span>
+          <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+        </a>
+        <a href="/personal-training/" class="btn-magnetic bg-[var(--color-bg)]/10 text-[var(--color-bg)] border border-[var(--color-bg)]/30 px-8 py-4 rounded-full text-base font-semibold">
+          <span class="relative z-10">Explore Programs</span>
+          <span class="btn-bg bg-[var(--color-bg)]/20 rounded-full"></span>
+        </a>
+      </div>
+      <div data-hero-text class="flex items-center gap-2">
+        <div class="flex">
+          <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          <Icon name="ph:star-half-fill" class="size-4 text-yellow-400" />
+        </div>
+        <span class="font-[var(--font-mono)] text-sm text-[var(--color-bg)]/70">4.6/5 · 14 Google Reviews</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES OVERVIEW -->
+  <section class="py-24 px-8 md:px-16">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-12">
+        <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">OUR PROGRAMS</p>
+        <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-primary)] mb-4">
+          Personalized Programs for Real Health Challenges
+        </h2>
+        <p class="text-[var(--color-muted)] text-lg max-w-2xl leading-relaxed">
+          We don't do generic fitness plans. Every FIT360 program is built around your body, your conditions, and your schedule.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="/personal-training/" class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="w-12 h-12 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon name="ph:person-simple-run-fill" class="size-6 text-[var(--color-primary)]" />
+          </div>
+          <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">Personal Training</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">1-on-1 coaching tailored to your health history and goals. Private studio sessions with a dedicated trainer.</p>
+          <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">Learn more <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+        <a href="/nutrition-coaching/" class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="w-12 h-12 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon name="ph:bowl-food-fill" class="size-6 text-[var(--color-primary)]" />
+          </div>
+          <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">Nutrition Coaching</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">Personalized meal plans from licensed nutritionists. No crash diets. Science-backed food strategies that fit real life.</p>
+          <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">Learn more <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+        <a href="/exercise-specialist/" class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="w-12 h-12 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon name="ph:heartbeat-fill" class="size-6 text-[var(--color-primary)]" />
+          </div>
+          <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">Exercise Specialist</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">Advanced movement programming for complex health conditions, postural correction, and performance.</p>
+          <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">Learn more <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+        <a href="/private-studio/" class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="w-12 h-12 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon name="ph:buildings-fill" class="size-6 text-[var(--color-primary)]" />
+          </div>
+          <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">Private Studio</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">Train in a distraction-free private studio. No crowds, no waiting. Just you, your trainer, and your goals.</p>
+          <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">Learn more <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+        <a href="/home-training/" class="card-lift group bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="w-12 h-12 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon name="ph:house-fill" class="size-6 text-[var(--color-primary)]" />
+          </div>
+          <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">Home Training</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">Full coaching programs delivered to your door. Equipment included. Weekly check-ins via WhatsApp.</p>
+          <span class="flex items-center gap-1 text-sm font-semibold text-[var(--color-accent)]">Learn more <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+        <a href="/contact/" class="card-lift group bg-[var(--color-accent)] rounded-3xl p-8 flex flex-col justify-between">
+          <div>
+            <Icon name="ph:calendar-check-fill" class="size-12 text-white/80 mb-6" />
+            <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3 text-white">Not sure where to start?</h3>
+            <p class="text-white/80 text-sm leading-relaxed mb-4">Book a free consultation. We'll assess your needs and recommend the right program.</p>
+          </div>
+          <span class="flex items-center gap-1 text-sm font-bold text-white">Book free consultation <Icon name="ph:arrow-right-bold" class="size-4" /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HEALTH CONDITIONS -->
+  <section class="py-24 px-8 md:px-16 bg-[var(--color-primary)]/5">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+
+        <!-- LEFT: image with floating badges -->
+        <div class="relative group overflow-hidden rounded-3xl h-[520px] lg:h-full min-h-[420px]">
+          <!-- Photo -->
+          <img
+            src="/images/conditions.webp"
+            alt="Client doing therapeutic exercises at FIT360 Kharadi studio"
+            class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            loading="lazy"
+          />
+          <!-- Dark gradient bottom overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/80 via-transparent to-transparent rounded-3xl"></div>
+
+          <!-- Bottom-left text overlay -->
+          <div class="absolute bottom-0 left-0 p-8">
+            <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-2">CONDITION-SPECIFIC CARE</p>
+            <p class="font-[var(--font-drama)] italic text-2xl text-[var(--color-bg)] leading-snug">
+              Exercise is medicine<br/>when prescribed correctly.
+            </p>
+          </div>
+
+          <!-- Top-right floating badge -->
+          <div class="absolute top-6 right-6 bg-[var(--color-bg)]/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg">
+            <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-wider mb-0.5">CONDITIONS TREATED</p>
+            <p class="font-[var(--font-heading)] font-bold text-2xl text-[var(--color-primary)]">6+</p>
+          </div>
+        </div>
+
+        <!-- RIGHT: condition links + CTA -->
+        <div>
+          <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">CONDITION-SPECIFIC CARE</p>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-primary)] mb-6 leading-tight">
+            We Specialise in Exercise-Based Condition Management
+          </h2>
+          <p class="text-[var(--color-muted)] text-lg leading-relaxed mb-10">
+            FIT360 trainers work with clients managing serious health conditions. Exercise is medicine when prescribed correctly.
+          </p>
+
+          <!-- 6 conditions as clean link rows -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+            <a href="/pcod-reversal/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:flower-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">PCOD Reversal</span>
+            </a>
+            <a href="/diabetes-reversal/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:drop-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">Diabetes Management</span>
+            </a>
+            <a href="/arthritis-relief/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:bone-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">Arthritis Relief</span>
+            </a>
+            <a href="/sciatica-pain-relief/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:lightning-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">Sciatica Pain Relief</span>
+            </a>
+            <a href="/slip-disc-back-pain/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:stack-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">Slip Disc and Back Pain</span>
+            </a>
+            <a href="/spondylitis-management/" class="group flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--color-accent)] transition-colors duration-200">
+                <Icon name="ph:shield-check-fill" class="size-4 text-[var(--color-accent)] group-hover:text-white transition-colors duration-200" />
+              </div>
+              <span class="text-sm font-medium text-[var(--color-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-200">Spondylitis Management</span>
+            </a>
+          </div>
+
+          <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-primary)] text-[var(--color-bg)] px-8 py-4 rounded-full text-base font-semibold">
+            <span class="relative z-10 flex items-center gap-2">
+              Book a Free Consultation
+              <Icon name="ph:arrow-right-bold" class="size-5" />
+            </span>
+            <span class="btn-bg bg-[var(--color-accent)] rounded-full"></span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY FIT360 -->
+  <section class="py-24 px-8 md:px-16">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">WHY FIT360</p>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-primary)] mb-6">
+            A Team of Experts, Focused Entirely on You
+          </h2>
+          <p class="text-[var(--color-muted)] text-lg leading-relaxed mb-10">
+            Most gyms give you access to equipment and a trainer who watches. FIT360 gives you a clinical team: your personal trainer, your nutritionist, and your exercise specialist work together on a single program designed around your body and your goals.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <Icon name="ph:atom-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h3 class="font-[var(--font-heading)] font-bold text-base mb-1">Science-First</h3>
+                <p class="text-[var(--color-muted)] text-sm leading-relaxed">Every program is built on clinical exercise science and evidence-based nutrition, not trends.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <Icon name="ph:users-three-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h3 class="font-[var(--font-heading)] font-bold text-base mb-1">Multidisciplinary</h3>
+                <p class="text-[var(--color-muted)] text-sm leading-relaxed">Your trainer, nutritionist, and exercise specialist collaborate on a single integrated plan.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <Icon name="ph:brain-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h3 class="font-[var(--font-heading)] font-bold text-base mb-1">Condition-Aware</h3>
+                <p class="text-[var(--color-muted)] text-sm leading-relaxed">We specialize in chronic conditions. Your trainer understands PCOD, diabetes, back pain, and joint issues.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <Icon name="ph:lock-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h3 class="font-[var(--font-heading)] font-bold text-base mb-1">Private and Focused</h3>
+                <p class="text-[var(--color-muted)] text-sm leading-relaxed">No crowd. No noise. One client, one trainer, full attention every session.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <img
+            src="/images/team.webp"
+            alt="FIT360 team of trainers and nutritionists at the Kharadi studio"
+            class="w-full h-[500px] object-cover rounded-3xl"
+            loading="lazy"
+          />
+          <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="flex">
+                <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+                <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+                <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+                <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+                <Icon name="ph:star-half-fill" class="size-4 text-yellow-400" />
+              </div>
+              <div>
+                <p class="font-[var(--font-heading)] font-bold text-sm">4.6 / 5</p>
+                <p class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">14 Google Reviews</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="py-24 px-8 md:px-16 bg-[var(--color-primary)]">
+    <div class="max-w-4xl mx-auto">
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">HOW IT WORKS</p>
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-bg)] mb-16">
+        Your Path from Consultation to Results
+      </h2>
+      <div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">01</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Free Fitness Consultation</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">We assess your health history, conditions, goals, and schedule. No sales pressure.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">02</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Program Design</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">Your trainer, nutritionist, and exercise specialist design a 360 plan built for your body.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">03</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">PT Sessions Begin</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">You start training 1-on-1 in our private studio or at home, with your customized program.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">04</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Nutrition Consultation</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">Your licensed nutritionist reviews your diet and creates a hormone-friendly, condition-specific meal plan.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">05</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Weekly Dietitian Check-ins</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">Every week, your nutritionist reviews your food diary and adjusts your plan based on your progress.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8 border-b border-[var(--color-bg)]/10">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">06</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Progress Tracking</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">Every 4 to 6 weeks, we re-test your fitness markers, blood sugar response, body composition, and energy levels.</p>
+          </div>
+        </div>
+        <div class="flex gap-8 py-8">
+          <span class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] w-8 shrink-0 mt-1">07</span>
+          <div>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg text-[var(--color-bg)] mb-2">Plan Refinement</h3>
+            <p class="text-[var(--color-bg)]/60 leading-relaxed">We update your program based on data. The plan evolves as your body does.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="py-24 px-8 md:px-16">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-12 text-center">
+        <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-3">CLIENT RESULTS</p>
+        <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-[var(--color-primary)]">
+          What Clients Say About FIT360
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="flex mb-4">
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          </div>
+          <Icon name="ph:quotes-fill" class="size-8 text-[var(--color-accent)]/30 mb-4" />
+          <p class="text-[var(--color-dark)]/80 leading-relaxed mb-6 italic">I tried diets, pills, and gym workouts for years with no real change. After 3 months with FIT360's PCOD program, I have regular periods, more energy, and I actually feel in control of my body.</p>
+          <div>
+            <p class="font-[var(--font-heading)] font-bold text-sm">Riya</p>
+            <p class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">28, Kharadi</p>
+          </div>
+        </div>
+        <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="flex mb-4">
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          </div>
+          <Icon name="ph:quotes-fill" class="size-8 text-[var(--color-accent)]/30 mb-4" />
+          <p class="text-[var(--color-dark)]/80 leading-relaxed mb-6 italic">The team at FIT360 genuinely cares about your health, not just your workout. Having a nutritionist and trainer work together made all the difference for my results.</p>
+          <div>
+            <p class="font-[var(--font-heading)] font-bold text-sm">Vinnie S.</p>
+            <p class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">Pune</p>
+          </div>
+        </div>
+        <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+          <div class="flex mb-4">
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+            <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          </div>
+          <Icon name="ph:quotes-fill" class="size-8 text-[var(--color-accent)]/30 mb-4" />
+          <p class="text-[var(--color-dark)]/80 leading-relaxed mb-6 italic">I had been on diabetes medication for 5 years with no real change. After working with FIT360, my energy shot up, I lost 7kg, and my doctor said I could start tapering off medication.</p>
+          <div>
+            <p class="font-[var(--font-heading)] font-bold text-sm">Diabetes Client</p>
+            <p class="font-[var(--font-mono)] text-xs text-[var(--color-muted)]">Pune</p>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+        <p class="font-[var(--font-mono)] text-sm text-[var(--color-muted)] flex items-center justify-center gap-1">
+          <Icon name="ph:star-fill" class="size-4 text-yellow-400" />
+          4.6 out of 5 stars, 14 reviews on Google
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="py-24 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(2rem,5vw,4rem)] text-white mb-6">
+        Ready to Start? Your First Consultation Is Free.
+      </h2>
+      <p class="text-white/80 text-lg leading-relaxed mb-10">
+        Tell us about your health goals and conditions. We'll design a program that fits your life, your body, and your schedule.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-white text-[var(--color-accent)] px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">
+          Book My Free Consultation
+          <Icon name="ph:arrow-right-bold" class="size-5" />
+        </span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import gsap from 'gsap';
+  document.addEventListener('DOMContentLoaded', () => {
+    gsap.from('[data-hero-text]', {
+      y: 40,
+      opacity: 0,
+      duration: 1.1,
+      stagger: 0.12,
+      ease: 'power3.out',
+      delay: 0.2,
+    });
+  });
+</script>

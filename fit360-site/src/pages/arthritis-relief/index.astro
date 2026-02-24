@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { medicalBusinessPageSchema } from '../../lib/schema';
+
+const faqs = [
+  {
+    question: 'Can I exercise with severe arthritis?',
+    answer: 'Yes, with the right program. We adapt every exercise to your current joint function and pain levels. The goal is to reduce pain over time, not push through it.',
+  },
+  {
+    question: 'Which joints do you work with?',
+    answer: 'We address arthritis in the knees, hips, shoulders, hands, and spine. Programs are tailored to the specific joints affected.',
+  },
+  {
+    question: 'Will exercise make my arthritis worse?',
+    answer: 'No. When programmed correctly, exercise reduces arthritis pain and inflammation over time. The key is using the right type and intensity of movement.',
+  },
+  {
+    question: 'How soon will I see improvement?',
+    answer: 'Most clients notice reduced stiffness and pain within 4 to 8 weeks of consistent training.',
+  },
+];
+
+const schema = medicalBusinessPageSchema(
+  brand,
+  {
+    name: 'Arthritis Relief Program',
+    slug: 'arthritis-relief',
+    description: "FIT360's arthritis relief program in Pune uses joint-safe strength training and mobility exercises to reduce pain and improve daily function.",
+  },
+  faqs,
+);
+
+const title = 'Arthritis Relief Program Pune | FIT360';
+const description = "FIT360's arthritis relief program in Pune uses joint-safe strength training and mobility exercises to reduce pain and improve daily function. Expert guidance.";
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/conditions.webp" alt="Arthritis relief exercise program at FIT360 Pune"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Arthritis Relief</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">JOINT-SAFE EXERCISE</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Arthritis Relief Program in Pune: Move Better, Hurt Less
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        Arthritis is not a reason to stop moving. In fact, the right kind of exercise is one of the most effective treatments for arthritis pain. FIT360's joint-safe programs are designed to reduce inflammation, improve joint function, and help you regain the movement you need for daily life.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Benefits of Exercise for Arthritis</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { title: 'Reduces Joint Inflammation', desc: 'Regular low-impact movement reduces the inflammatory markers that cause arthritis pain and stiffness.', icon: 'ph:thermometer-fill' },
+          { title: 'Builds Protective Muscle', desc: 'Stronger muscles around affected joints absorb more load, reducing direct joint stress and pain.', icon: 'ph:lightning-fill' },
+          { title: 'Improves Range of Motion', desc: 'Targeted mobility work gradually restores joint flexibility and reduces the stiffness that limits daily activity.', icon: 'ph:arrows-out-fill' },
+          { title: 'Reduces Pain Over Time', desc: 'Clinical evidence consistently shows that appropriate exercise reduces chronic arthritis pain over 8 to 12 weeks.', icon: 'ph:chart-line-up-fill' },
+          { title: 'Maintains Bone Density', desc: 'Weight-bearing and resistance exercises prevent bone loss, which is especially important for osteoarthritis clients.', icon: 'ph:bone-fill' },
+          { title: 'Improves Daily Function', desc: 'Better joint function means better quality of life. Everyday tasks like walking, climbing stairs, and carrying become easier.', icon: 'ph:person-fill' },
+        ].map((point) => (
+          <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-6">
+            <div class="w-10 h-10 bg-[var(--color-accent)]/10 rounded-xl flex items-center justify-center mb-4">
+              <Icon name={point.icon} class="size-5 text-[var(--color-accent)]" />
+            </div>
+            <h3 class="font-[var(--font-heading)] font-bold mb-2">{point.title}</h3>
+            <p class="text-[var(--color-muted)] text-sm leading-relaxed">{point.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-bg)] mb-10">What's in Your Program</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {[
+          'Movement assessment and joint-specific screening',
+          'Low-impact strength exercises that protect joints',
+          'Targeted mobility and flexibility work',
+          'Anti-inflammatory nutrition guidance from your nutritionist',
+          'Weekly monitoring of pain levels and function',
+          'Studio or home training options available',
+        ].map((item) => (
+          <div class="flex items-start gap-3">
+            <Icon name="ph:arrow-right-bold" class="size-5 text-[var(--color-accent)] shrink-0 mt-0.5" />
+            <p class="text-[var(--color-bg)]/80 leading-relaxed">{item}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-white border border-[var(--color-dark)]/8 rounded-2xl overflow-hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-[var(--font-heading)] font-semibold">
+              {faq.question}
+              <Icon name="ph:caret-down" class="size-5 text-[var(--color-accent)] group-open:rotate-180 transition-transform" />
+            </summary>
+            <div class="px-6 pb-6 text-[var(--color-muted)] leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">Book Your Free Arthritis Consultation</h2>
+      <p class="text-white/80 mb-8 text-lg">We'll assess your joints and design a safe program to help you move better with less pain.</p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-white text-[var(--color-accent)] px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

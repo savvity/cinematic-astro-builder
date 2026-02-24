@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { servicePageSchema, breadcrumbSchema } from '../../lib/schema';
+
+const schema = servicePageSchema(
+  brand,
+  {
+    name: 'Private Fitness Studio',
+    slug: 'private-studio',
+    description: 'FIT360 private fitness studio in Kharadi, Pune. One client at a time. No crowds, no waiting, complete trainer focus.',
+  },
+);
+
+const title = 'Private Fitness Studio in Kharadi, Pune | FIT360';
+const description = "Train in FIT360's private fitness studio in Kharadi, Pune. No crowds, no waiting. One client, one trainer, complete focus. Book your session.";
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/hero.webp" alt="FIT360 private fitness studio in Kharadi Pune"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Private Studio</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">KHARADI, PUNE</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Private Fitness Studio in Kharadi: Train Without Distractions
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        FIT360 operates on a one-client, one-trainer model. When you train at FIT360, the studio is yours. No crowds, no waiting for equipment, no noise. Just you and your coach working toward your goals.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- STUDIO DETAILS -->
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">Studio Details</h2>
+          <div class="space-y-5">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                <Icon name="ph:map-pin-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <p class="font-[var(--font-heading)] font-semibold mb-1">Location</p>
+                <p class="text-[var(--color-muted)]">Grant Rd, EON Free Zone, Kharadi, Pune, Maharashtra 411014</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                <Icon name="ph:clock-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <p class="font-[var(--font-heading)] font-semibold mb-1">Hours</p>
+                <p class="text-[var(--color-muted)]">Monday to Saturday, 6:00 AM to 8:00 PM</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                <Icon name="ph:phone-call-fill" class="size-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <p class="font-[var(--font-heading)] font-semibold mb-1">Book a Session</p>
+                <a href="tel:+917397951908" class="text-[var(--color-accent)] hover:underline">+91 7397951908</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <img src="/images/hero.webp" alt="FIT360 private fitness studio interior in Kharadi"
+          class="w-full h-[400px] object-cover rounded-3xl" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 REASONS -->
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-primary)]/5">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">5 Reasons to Train in a Private Studio</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { num: '01', title: 'Full Trainer Attention', desc: 'Your trainer is focused entirely on you, every rep, every session. No distractions, no other clients.' },
+          { num: '02', title: 'No Waiting for Equipment', desc: "The equipment you need is ready when you arrive. No sharing, no waiting, no compromising your program." },
+          { num: '03', title: 'Your Health History Stays Private', desc: 'Your medical conditions, goals, and progress are between you and your trainer. No audience.' },
+          { num: '04', title: 'Comfortable for Beginners', desc: 'Starting fitness for the first time is easier without an audience. A private studio removes the intimidation factor.' },
+          { num: '05', title: 'Better Results from Focused Coaching', desc: 'Research consistently shows that focused, individualized coaching produces significantly better outcomes than group or independent training.' },
+        ].map((reason) => (
+          <div class="bg-white border border-[var(--color-dark)]/8 rounded-3xl p-8">
+            <p class="font-[var(--font-mono)] text-sm text-[var(--color-accent)] mb-3">{reason.num}</p>
+            <h3 class="font-[var(--font-heading)] font-bold text-lg mb-3">{reason.title}</h3>
+            <p class="text-[var(--color-muted)] text-sm leading-relaxed">{reason.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">See the Studio for Yourself</h2>
+      <p class="text-white/80 mb-8 text-lg">Book a free consultation and visit our Kharadi studio. No commitment required.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact/" class="btn-magnetic bg-white text-[var(--color-accent)] px-8 py-4 rounded-full font-semibold">
+          <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+          <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+        </a>
+        <a href="tel:+917397951908" class="btn-magnetic border border-white text-white px-8 py-4 rounded-full font-semibold">
+          <span class="relative z-10 flex items-center gap-2"><Icon name="ph:phone-call-fill" class="size-5" /> Call Us</span>
+          <span class="btn-bg bg-white/10 rounded-full"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,174 @@
+---
+import '../styles/global.css';
+import { localBusinessSchema } from '../lib/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/images/hero.webp',
+  schema,
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+const globalSchema = localBusinessSchema();
+const ogImageURL = new URL(ogImage, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImageURL} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="FIT360" />
+  <meta property="og:locale" content="en_IN" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImageURL} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- Google Fonts: Preset A -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Cormorant+Garamond:ital,wght@1,300;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Global LocalBusiness JSON-LD (present on every page) -->
+  <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
+
+  <!-- Page-specific JSON-LD -->
+  {schemas.map((s) => (
+    <script type="application/ld+json" set:html={JSON.stringify(s)} />
+  ))}
+</head>
+<body class="bg-[var(--color-bg)] text-[var(--color-dark)] font-[var(--font-heading)] antialiased overflow-x-hidden">
+  <slot />
+</body>
+
+<script>
+// ─── Scroll-reveal animation engine ─────────────────────────────────────────
+// Runs on every page. No dependencies. Uses IntersectionObserver.
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ── 1. Inner-page hero entrance ──────────────────────────────────────────
+  // The hero section on inner pages has pt-32. Stagger-animate its text
+  // children on load so the page feels alive immediately.
+  const innerHero = document.querySelector('section.pt-32');
+  if (innerHero) {
+    const textWrapper = innerHero.querySelector('.relative.z-10');
+    if (textWrapper) {
+      Array.from(textWrapper.children).forEach((el, i) => {
+        (el as HTMLElement).classList.add('anim-hero');
+        (el as HTMLElement).style.animationDelay = `${0.08 + i * 0.1}s`;
+      });
+    }
+  }
+
+  // ── 2. IntersectionObserver for scroll reveals ───────────────────────────
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.07, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  function reveal(el: Element, delay = 0) {
+    if (el.classList.contains('anim-reveal') || el.classList.contains('anim-fade')) return;
+    el.classList.add('anim-reveal');
+    (el as HTMLElement).style.transitionDelay = `${delay}ms`;
+    io.observe(el);
+  }
+
+  function fade(el: Element, delay = 0) {
+    if (el.classList.contains('anim-fade') || el.classList.contains('anim-reveal')) return;
+    el.classList.add('anim-fade');
+    (el as HTMLElement).style.transitionDelay = `${delay}ms`;
+    io.observe(el);
+  }
+
+  // ── 3. Find all animatable sections ─────────────────────────────────────
+  // Skip the homepage hero (data-hero) and the inner-page hero (pt-32).
+  const sections = document.querySelectorAll(
+    'section:not([data-hero]):not(.pt-32)'
+  );
+
+  sections.forEach((section) => {
+
+    // Section eyebrow labels (IBM Plex Mono labels like "OUR PROGRAMS")
+    section.querySelectorAll('p[class*="font-mono"]').forEach((el) => reveal(el));
+
+    // H2 and H3 headings
+    section.querySelectorAll('h2, h3').forEach((el) => reveal(el));
+
+    // Lead paragraphs just below section headings
+    section.querySelectorAll(
+      '.max-w-6xl > p, .max-w-5xl > p, .max-w-4xl > p, .max-w-3xl > p, .max-w-2xl > p'
+    ).forEach((el) => reveal(el));
+
+    // ── Grid children — cards, result items, etc. (staggered) ──
+    section.querySelectorAll('.grid > *').forEach((el, i) => {
+      reveal(el, (i % 6) * 80);
+    });
+
+    // ── Vertical icon+text lists (.space-y-6 and .space-y-4) ──
+    section.querySelectorAll('.space-y-6 > *, .space-y-4 > *').forEach((el, i) => {
+      reveal(el, i * 90);
+    });
+
+    // ── FAQ <details> rows ──
+    section.querySelectorAll('details').forEach((el, i) => {
+      reveal(el, i * 60);
+    });
+
+    // ── Standalone (non-background) images ──
+    section.querySelectorAll('img:not(.absolute)').forEach((el) => fade(el, 100));
+
+    // ── Flex bullet rows not already caught by grid (results sections) ──
+    section.querySelectorAll('.flex.items-start.gap-3').forEach((el, i) => {
+      reveal(el, (i % 6) * 75);
+    });
+
+    // ── Testimonial cards & any other cards with card-lift ──
+    section.querySelectorAll('.card-lift').forEach((el, i) => {
+      reveal(el, (i % 6) * 80);
+    });
+
+    // ── CTA / bottom buttons that live alone ──
+    section.querySelectorAll('a.btn-magnetic:not(nav a)').forEach((el, i) => {
+      reveal(el, i * 80 + 100);
+    });
+  });
+
+});
+</script>
+
+</html>

@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/sections/Navbar.astro';
+import Footer from '../../components/sections/Footer.astro';
+import { Icon } from 'astro-icon/components';
+import { brand } from '../../data/brand';
+import { medicalBusinessPageSchema } from '../../lib/schema';
+
+const faqs = [
+  {
+    question: 'Can I exercise when I have sciatic pain?',
+    answer: 'Yes. The right exercises reduce sciatic pain. We avoid positions and movements that aggravate your specific nerve compression and build from a safe baseline.',
+  },
+  {
+    question: 'How long until the pain reduces?',
+    answer: 'Most clients experience significant reduction in pain within 4 to 8 weeks of consistent training.',
+  },
+  {
+    question: 'Do I need an MRI before starting?',
+    answer: 'Not required, but useful. If you have imaging results, we review them before designing your program. If not, our assessment identifies your movement restrictions and pain triggers.',
+  },
+  {
+    question: 'Is this different from physiotherapy?',
+    answer: 'Complementary, not a replacement. FIT360 exercise programs focus on building the strength and mobility that prevent sciatica from recurring. We coordinate with physiotherapists when needed.',
+  },
+];
+
+const schema = medicalBusinessPageSchema(
+  brand,
+  {
+    name: 'Sciatica Pain Relief Program',
+    slug: 'sciatica-pain-relief',
+    description: 'FIT360 helps sciatica sufferers in Pune eliminate shooting leg pain through targeted core and spine exercises.',
+  },
+  faqs,
+);
+
+const title = 'Sciatica Pain Relief Pune | FIT360';
+const description = 'FIT360 helps sciatica sufferers in Pune eliminate shooting leg pain through targeted core and spine exercises. Expert personal trainers in Kharadi.';
+---
+<BaseLayout {title} {description} {schema}>
+  <Navbar />
+
+  <section class="relative pt-32 pb-20 px-8 md:px-16 overflow-hidden">
+    <img src="/images/conditions.webp" alt="Sciatica relief exercise program at FIT360 Pune"
+      class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/60 to-[var(--color-bg)]"></div>
+    <div class="relative z-10 max-w-4xl">
+      <nav class="flex items-center gap-2 font-[var(--font-mono)] text-xs text-[var(--color-muted)] mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <Icon name="ph:caret-right" class="size-3" />
+        <span class="text-[var(--color-accent)]">Sciatica Pain Relief</span>
+      </nav>
+      <p class="font-[var(--font-mono)] text-xs text-[var(--color-accent)] tracking-widest mb-4">SPINE AND NERVE HEALTH</p>
+      <h1 class="font-[var(--font-drama)] italic text-[clamp(2.5rem,6vw,5rem)] text-[var(--color-primary)] leading-tight mb-6">
+        Sciatica Pain Relief in Pune: Targeted Exercise to End the Shooting Pain
+      </h1>
+      <p class="text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed mb-8">
+        Sciatica causes shooting pain from the lower back down through the leg, often making sitting, walking, and exercise feel impossible. FIT360's sciatica relief program uses targeted core strengthening and nerve decompression exercises to address the root cause of sciatic pain.
+      </p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-[var(--color-accent)] text-white px-8 py-4 rounded-full font-semibold">
+        <span class="relative z-10 flex items-center gap-2">Book a Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">What Causes Sciatica</h2>
+          <p class="text-[var(--color-muted)] leading-relaxed mb-6">
+            Sciatica is caused by compression or irritation of the sciatic nerve, the longest nerve in the body running from the lower back through the hips and down each leg. Common causes include:
+          </p>
+          <div class="space-y-3">
+            {['A herniated or bulging lumbar disc pressing on the nerve', 'Tight piriformis muscle compressing the nerve in the hip', 'Weak core muscles causing spinal instability', 'Poor posture compressing the lower spine', 'Prolonged sitting increasing disc and nerve pressure'].map((cause) => (
+              <div class="flex items-start gap-3">
+                <Icon name="ph:dot-outline-fill" class="size-5 text-[var(--color-accent)] shrink-0 mt-0.5" />
+                <p class="text-sm leading-relaxed">{cause}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-8">How Exercise Helps</h2>
+          <div class="space-y-5">
+            {[
+              { title: 'Core Strengthening', desc: 'A strong core supports the spine, reducing the disc pressure that compresses the sciatic nerve.', icon: 'ph:circle-fill' },
+              { title: 'Piriformis and Hip Release', desc: 'Targeted stretching and strengthening relieves muscle-based sciatic compression in the hip region.', icon: 'ph:arrows-out-fill' },
+              { title: 'Nerve Glide Exercises', desc: 'Specific neural mobilization exercises reduce nerve irritability and restore normal nerve movement.', icon: 'ph:lightning-fill' },
+              { title: 'Postural Correction', desc: 'Fixing the postural habits that create chronic lumbar compression prevents sciatica from returning.', icon: 'ph:person-fill' },
+            ].map((point) => (
+              <div class="flex gap-4">
+                <div class="w-10 h-10 bg-[var(--color-accent)]/10 rounded-xl flex items-center justify-center shrink-0">
+                  <Icon name={point.icon} class="size-5 text-[var(--color-accent)]" />
+                </div>
+                <div>
+                  <h3 class="font-[var(--font-heading)] font-bold mb-1">{point.title}</h3>
+                  <p class="text-[var(--color-muted)] text-sm leading-relaxed">{point.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-[var(--font-drama)] italic text-[clamp(1.8rem,4vw,3rem)] text-[var(--color-primary)] mb-10">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-white border border-[var(--color-dark)]/8 rounded-2xl overflow-hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-[var(--font-heading)] font-semibold">
+              {faq.question}
+              <Icon name="ph:caret-down" class="size-5 text-[var(--color-accent)] group-open:rotate-180 transition-transform" />
+            </summary>
+            <div class="px-6 pb-6 text-[var(--color-muted)] leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-8 md:px-16 bg-[var(--color-accent)]">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="font-[var(--font-drama)] italic text-3xl md:text-5xl text-white mb-4">Get Relief from Sciatica Pain</h2>
+      <p class="text-white/80 mb-8 text-lg">Book a free consultation. We'll assess your movement and design a program to eliminate the pain.</p>
+      <a href="/contact/" class="btn-magnetic inline-flex bg-white text-[var(--color-accent)] px-10 py-5 rounded-full text-lg font-bold">
+        <span class="relative z-10 flex items-center gap-2">Book Free Consultation <Icon name="ph:arrow-right-bold" class="size-5" /></span>
+        <span class="btn-bg bg-[var(--color-primary)] rounded-full"></span>
+      </a>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
